@@ -63,12 +63,10 @@ Banana tokens will start off at 100 TRX / BT for the genesis mini-game.  Each su
 BT Price Scaling Examples(CYC:RND:MG):
   1.	1:1:1 = 100 TRX / BT
   2.	1:1:2 = 105 TRX / BT
-  3.	1:1:100 = 505 TRX / BT
+  3.	1:1:100 = 595 TRX / BT
   4.	1:2:1 = 105 TRX / BT
-  5.	1:2:2 = 200 TRX / BT
-  6.	1:2:100 = 510 TRX / BT
-  7.	2:1:1 = 150 TRX / BT
-  8.	2:1:2 = 200 TRX / BT
+  5.	1:2:2 = 110 TRX / BT
+  6.	1:2:100 = 600 TRX / BT
 
 9.INCENTIVES TO PLAY
 1.	Players are eligible to win in several ways (for this example we will use 3000 BT / MG)
