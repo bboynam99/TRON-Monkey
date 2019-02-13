@@ -1,0 +1,511 @@
+# 100th Monkey - Technical Specification 
+
+## 0. Overview
+
+This technical specification outlines the features of the 100th Monkey smart contract, as currently conceptualized. It also addresses particular technical challenges and security concerns with a game of this nature. 
+
+Unresolved issues or open questions are identified with the `Question` heading. Tricky technical or game-play problems are identified with the `Challenge` heading, in some cases accompanied by `Options` and/or `Recommendations`.
+
+**1. Game Functions**
+- 1.1. Units of Time
+- 1.2. Prizes
+- 1.3. Tokens & Rewards
+- 1.4. Referrals
+- 1.5. User Functions
+- 1.6. Admin Functions
+- 1.7. View Functions
+- 1.8. Global Storage
+- 1.9. Admin Fees
+- 1.10. Percentage Breakdowns
+	
+**2. Technical Considerations**
+- 2.1. Gas Costs
+- 2.2. Persistent Storage
+- 2.3. Random Number Generation
+
+**3. Security Concerns**
+- 3.1. Blocking Smart Contracts
+- 3.2. Secure RNG
+- 3.3. Safe Withdrawal
+- 3.4. Sybil Attacks
+- 3.5. High Gas Abuse
+- 3.6. Token Transfers
+
+## 1. Game Functions
+### 1.1. Units of Time
+
+Global time counts:
+- Mini-Games: 100/round
+- Rounds: 100/cycle
+- Cycles: 1
+
+Special actions: 
+- every 10 Mini-Games (round airdrops paid out, tokens slashed); an "Era"
+- every 25 Mini-Games (refs paid out); an "Epoch"
+
+Time relationships:
+- 1 Round == 100 Mini-Games
+- 1 Cycle == 100 Rounds == 10,000 Mini-Games
+
+On transition between mini-games:
+- generate random seed
+- award Mini-Game Monkey Prize from previous mini-game
+- award Mini-Game Airdrop from previous mini-game
+- check if there is a new era or epoch `(miniGameCount % 10 == 0 || miniGameCount % 25 == 0)`. If so, award Round Airdrops and/or Ref Airdrop as necessary
+- check if there is a new round. If so, advance round as necessary
+- increment mini-game and set up new blank storage
+- generate available bananas for next mini-game
+- adjust banana price
+- store the start and end token number range for this Mini-Game
+
+On transition between rounds:
+- award Round Monkey Prize
+- check if the Cycle is over. If so, distribute Cycle Monkey Prize
+- increment round and set up new blank storage
+- store the start number range for this Round and the end token range for the previous Round
+
+`Question`: What should happen when a user sends more funds than there are tokens available or if they send funds while a Mini-Game is processing?
+
+`Recommendation`: Excess funds should be added to the user persistent storage. They can withdraw or reinvest these later. This is a safer pattern than attempting to return funds with `transfer` or `send` in the same transaction. If a user completes a round, they should automatically call the first commit function to begin processing the round. They will receive a small fixed bounty to cover the increased gas costs with processing. Similarly, if the Mini-Game state is `processing` rather than `active`, the first user to buy after the RNG delay (currently three blocks) will automatically trigger the resolve function and start the Mini-Game. If a user sends funds while a game is processing but before the RNG timer is up, the transaction should revert. It may be interesting to have a longer delay than is needed for security in order to build anticipation for the next round (~10-20 blocks).
+
+`Question`: How does the game start? 
+
+`Options`: Unlock based on an admin transaction. Unlock at a set timer. Unlock immediately on contract deploy.
+
+### 1.2. Prizes
+
+Mini-Game Monkey Prize
+- Awarded to one eligible address
+- Awarded after the resolution of each Mini-Game
+- 25% of TRX value from that Mini-Game
+
+Mini-Game Airdrop
+- Awarded to one eligible address
+- Awarded after the resolution of each Mini-Game
+- 3% of TRX value from that Mini-Game
+
+Round Monkey Prize
+- Awarded to three eligible addresses: (#1: 50%, #2: 30%, #3: 20%)
+- Awarded after the resolution of each Round
+- 50% of the Progressive Pot (made up of 28% of all incoming TRX value)
+
+Round Airdrop
+- Awarded to one eligible address
+- Awarded after the resolution of each Era
+- 8% of TRX value from that Era
+
+Cycle Monkey Prize
+- Awarded to three eligible addresses: (#1: 50%, #2: 30%, #3: 20%)
+- Awarded after the resolution of the cycle
+- 100% of the Progressive Pot (made up of 25% of all incoming TRX value)
+
+`Recommendation`: Eras and Epochs add unnecessary additional layers of time to the game. Award Round Airdrops once per Round. Either award Referral Prizes once per Round or once per Mini-Game.
+
+### 1.3. Tokens & Rewards
+
+A random number of new Banana Tokens are minted at the start of each round (between 100,000 and 200,000). Token price increases linearly each Mini-Game, but does not scale within a Mini-Game. Price starts 0.00001 ETH / BT and increases by 0.000005 ETH / BT for each new Mini-Game. Users earn separate rewards based on their proportional token holdings in the current Mini-Game (10%) and the current Round (20%). 
+
+`Question`: Are Rewards determined by A) a proportional share of total token supply? or B) a first-in-earns-more model where held tokens accumulate rewards based on later purchases?
+
+`Question`: Should Banana Tokens be ERC-20 compliant? 
+
+`Recommendation`: No, particularly if token numbers are used as "lottery tickets" to determine the prize winners. This adds unnecessary storage overhead and complexity. Furthermore, token transfer functions open up a huge surface area for underflow/overflow attacks (see section 3.6.). While certainly possible to design securely, a safer and simpler model is to not allow the sale or transfer of tokens. This also means the tokens can be tracked with simplified internal accounting, reducing user gas costs.
+
+`Challenge`: Issuing a unique number for each token share will likely produce unnecessary complexity and possible gas limit issues when determining prizes. For example, updating a user mapping with 50,000+ unique token numbers quickly becomes unfeasible. It may be possible to define purchased tokens within a range, only requiring two numbers to be saved. The feasibility of this idea requires further testing.
+
+`Options`: Four models for determining prize winners are:
+- "tickets": where each Banana token represents a unique chance to win a prize. This quickly becomes untenable with gas costs associated with looping. This also does not mesh well with token slashing. 
+- each valid buy from an address counts as a single chance to win, regardless of the amount purchased 
+- winners are determined by weighted share of tokens held (described in Recommendation below).
+- raise token prize significantly, so that the number of unique participants for each prize can be managed with a loop 
+
+Pseudocode example for Option 4:
+```solidity
+function buyShares() public payable {
+	shares = msg.value / sharePrice
+	require (shares < safeLoopLimit)
+	while (shares > 0) {
+	  winningTickets.push(msg.sender);
+	  shares--;
+	}
+``` 
+
+`Recommendation`: When a user purchases Banana Tokens, store a range of their token numbers (min and max). The random number generator will select a winning token number for each prize. Rather than looping over the token ranges to associate the winning number with an address, simply have a check for whether or not the user holds the winning number: `if (winningNumber[lastMiniGameUpdated[msg.sender]] > bananaTokenMin[msg.sender] && winningNumber[lastMiniGameUpdated[msg.sender]] < bananaTokenMax[msg.sender])`. This check can take place on the next user action, and then move the prize to persistent storage. At this point, the winner can also be logged. Before the log happens, use events to calculate the winner's address on the front end.
+
+`Challenge`: What is the best way to handle multiple token ranges owned by a single user? This again requires looping if the user bought multiple ranges.
+
+`Recommendation`: When the winning token number for Rounds and Cycles is determined, also find out what Mini-Game the ticket took place in. This could be appoximated with a crude depth search with seven logic calls going from Cycle > Round and another seven going from Round to Mini-Game `if (winningTokenNumber > tokenRangeStart[round[50]])` or by looping through the Rounds/Mini-Games. When a user buys a ticket, also store the Mini-Game it was purchased in and map the Mini-Games the user has participated in. Only search for their eligibility for a Round or Cycle prize if they participated in the Mini-Game that contains the winning token mumber. Then check the user's token range against the winning token. Loop through multiple ranges if necessary (bounded to only the ranges within that Mini-Game). Limit the number of unique buys an address can make within a Mini-Game to a safe loop limit.
+
+Below is preliminary testing for how to idenify the round a winning ticket is in. The gas cost for the `findWinner()` function is between ~28,000 - ~70,000 for 100 rounds. This could be further improved with additional range narrowing.
+
+```solidity
+pragma solidity ^0.4.24;
+
+contract roundSearch {
+    
+    uint public roundCount;
+    uint public tokenCount;
+    mapping (uint => uint) public roundStart;
+    mapping (uint => uint) public roundEnd;
+    uint public winningRound;
+    
+    function simulateRounds(uint r) public {
+        for (uint i = 0; i < r; i++) {
+            generateTokens();
+        }
+    }
+    
+    function generateTokens() internal {
+        roundCount++;
+        uint randTokens = uint(keccak256(abi.encodePacked(roundCount))) % 100000;
+        uint roundTokens = 100000 + randTokens;
+        roundStart[roundCount] = tokenCount + 1;
+        tokenCount += roundTokens;
+        roundEnd[roundCount] = tokenCount;
+    }
+    
+    function findWinner(uint winningNumber) public {
+        if (winningNumber >= roundStart[50]) {
+            for (uint i = 50; i <= roundCount; i++) {
+                if (winningNumber >= roundStart[i] && winningNumber <= roundEnd[i]) {
+                    winningRound = i;
+                    break;
+                }
+            }
+        } else if (winningNumber < roundStart[50]) {
+            for (i = 1; i < 50; i++) {
+                if (winningNumber >= roundStart[i] && winningNumber <= roundEnd[i]) {
+                    winningRound = i;
+                    break;
+                }
+            }
+        }
+    }
+}
+```
+
+### 1.4. Referrals
+
+Referrals are tracked within each Round. 5% of all buys go to a referral asddress of that players choosing.
+
+`Question`: Are referrals "single-use" (ie, inputed as an temporary argument into a function for each buy)? Or "sticky" (ie, once someone uses their link, the referrer will continue to accumulate credit)?
+
+`Question`: What happens when no referral is used? No ref link used, this amount goes to the current MG Pot.
+
+### 1.5. User Functions
+
+- Buy: buys into current Mini-Game and current Round; option to include referring address
+- Withdraw: withdraws all earned TRX from rewards, prizes, and referrals
+- Replay: buys into current Mini-Game and current Round using unclaimed rewards/TRX
+
+### 1.6. Admin Functions
+
+- Admin Withdraw: withdraws earned admin fees
+
+`Recommendation`: All admin fees should withdraw to a separate contract. In this contract, there should be a breakdown of the percentages for the various team members. This allows for a trustless distribution of the agreed profit split
+
+- Start Cycle: callable only once, at the beginning of the game. Will allow final customization of global variables
+- Restart MiniGame: callable only if the commit portion of Mini-Game resolution was called, but the resolve portion was not called within 256 blocks. This event would freeze the game. Admins need a way to reseed the RNG and start the next Mini-Game. It is highly unlikely this will ever need to be called if the incetives are properly designed
+- Early Resolve: callable only in the event of the game stalling
+
+`Options`: Admins need a way to resolve the game if it stalls before resolution. This function should remain trustless so that users are not concerned about a contract that can be maliciously frozen or liquidated. There are two options for Early Resolve. A) user DAO, where users (determined by proportional share) can vote to resolve the game. A high percentage (70%+) would need to vote. B) Admin resolve based on a period of inactivity (i.e., if at any point a round fails to progress within a certain time frame, the admin can process the game in any state, awarding all prizes). An example requirement might be `if (timeStart[currentMiniGame] < now - 1 week)`, meaning this could only be called if a Mini-Game did not resolve within one week.
+
+`Recommendation`: Option B.
+
+### 1.7. View Functions
+
+- current Mini-Game number
+- current Round number
+- available Banana Tokens in current Mini-Game
+- total Banana Tokens in current Mini-Game
+- total Banana Tokens in current Round
+- user Banana Tokens in current Round
+- user Banana Tokens in current Mini-Game
+- unclaimed user rewards
+- earned user referral rewards in current Round
+- current Mini-Game Monkey Prize
+- current Mini-Game Airdrop
+- current Round Monkey Prize
+- Cycle Monkey Prize
+- Referral Prize
+- Banana Token price
+- Winner of x Mini-Game
+- Winner of x Round
+
+### 1.8. Global Storage
+
+- percentage breakdowns for each prize and reward rates
+- Round and Mini-Game count
+- token price and supply
+- persistent user earned rewards storage
+
+### 1.9. Admin Fees
+
+- 2% of all TRX into the contract
+
+`Question`: What are the differences between the Development Fee and Foundation Fund? How can these be managed trustlessly?
+
+### 1.10. Percentage Breakdowns
+
+On each buy:
+- 25% Mini-Game Pot
+- 8% MG Air Drop
+- 5% Referral Rate
+- 15% Mini-game Rewards
+- 25% Progressive Pot
+- 20% Round Rewards
+- 2% Dev Fee
+- fixed amount (filled first) to provide incentives for processing the round. This could also be thought of as a "last to buy" and "first to buy" bonus
+
+After each Round:
+- 50% to winner or winners( Spilt x 3 50, 30, 20%)
+- 50% back to Progressive Pot
+
+After Cycle:
+- 100% to winner or winners( Spilt x 3 50, 30, 20%)
+
+## 2. Technical Considerations
+### 2.1. Gas Costs for EVM(Need consultation on this on the Tron Virtual Machine)
+
+Efficient management of persistent storage for thousands or tens of thousands of unique addresses, across multiple rounds and mini-games will be a critical design feature for this contract. Even with the following best practices, it's possible that we may run into functional limits of the Ethereum EVM (block gas limits, stack depth) or practical user concerns (extreme gas costs for any action) that place an upper limit on the number of parallel mini-games we are able to maintain in storage.
+
+Looping through unbounded arrays used to track or update player data will quickly lead to serious issues that may result in the locking of user funds. Once a sufficient number of players joined the game, looping through an array would either consume more than the block gas limit of the Ethereum network (~8 million gas), or reach the EVM call stack limit of 1024.
+
+`Recommendation`: The recommended pattern to address these issues is to maintain a limited number of global tracking variables on a user buy (token price, for example). Calculate user rewards and other gas-intensive tracking on specific user actions, and only for that user (for example, on withdraw). Write separate view-only functions that can provide live tracking information for the front end, without incurring gas costs. Ensuring that these functions do not change the contract state will allow the front end to pull live updates without requiring a transaction.
+
+### 2.2. Persistent Storage
+
+An accompanying issue is how to maintain persistent user storage across as many as 10,000 separate Mini-Games. In the recommended model for optimizing gas, users would still have to loop through each Mini-Game they participated in to find unclaimed rewards. 
+
+`Challenge`: How can we consolidate rewards accumulated in many different mini-games? 
+
+`Option`: A master mapping (address => uint256), that tracks all Mini-Games a user participated in. Then on withdraw, the user could collect divs only from the mini-games they participated in. However, even this model could break down after a certain point because of call stack limits with looping.
+
+`Option`: Cap participants in a mini-game to a number that can be safely looped over without running out of gas. Raise the incentive for any user to resolve the round. At the end of each mini-game, push mini-game div balances to persistent storage.
+
+`Option`: Cap the number of Mini-Games any unique address can participate in.
+
+`Recommendation`: Another way to handle this issue is a running tally of user rewards, where each user action saves the last Mini-Game and Round interacted with and moves any unclaimed divs or prizes into persistent storage. This prevents any unnecessary looping, and would keep gas costs proportional to the user engagement with the dapp. This feature would work even if the user was in all 10,000 mini-games.
+
+Preliminary example of how parallel Mini-Game and Round storage would work (note: this does not include the above recommendation for moving divs to persistent storage):
+
+```solidity
+pragma solidity ^0.4.24; 
+
+contract storageExample {
+    
+    constructor() public{
+        newMiniGame();
+        newRound();
+    }
+    
+    struct Participant {
+        address addr;
+        uint256 amount;
+    }
+    
+    struct MiniGame {
+       uint256 miniGameID;
+       uint256 fundsCollected;
+       uint numParticipants;
+       mapping (uint256 => Participant) participants;
+    }
+    
+    struct Round {
+       uint256 roundID;
+       uint256 fundsCollected;
+       uint numParticipants;
+       mapping (uint256 => Participant) participants;
+    }
+    
+    uint256 public roundCount = 0;
+    uint256 public miniGameCount = 0;
+    uint256 public roundLimit = 25 ether;
+    uint256 public miniGameLimit = 5 ether;
+    mapping (uint256 => Round) public rounds;
+    mapping (uint256 => MiniGame) public miniGames;
+    
+    function newMiniGame() internal {
+        miniGameCount++;
+        miniGames[miniGameCount] = MiniGame(miniGameCount, 0, 0);
+    }
+    
+    function newRound() internal {
+        roundCount++;
+        rounds[roundCount] = Round(roundCount, 0, 0);
+    }
+    
+    function getRoundParticipant(uint256 _id) public view returns(address){
+        Participant storage p = rounds[roundCount].participants[_id];
+        return p.addr;
+    }
+    
+    function buy() public payable {
+        
+        MiniGame storage m = miniGames[miniGameCount];
+        m.participants[m.numParticipants++] = Participant({addr: msg.sender, amount: msg.value});
+        m.fundsCollected += msg.value;
+        
+        Round storage r = rounds[roundCount];
+        r.participants[r.numParticipants++] = Participant({addr: msg.sender, amount: msg.value});
+        r.fundsCollected += msg.value;
+        
+        if (m.fundsCollected >= miniGameLimit) {
+            newMiniGame();
+        }
+        
+        if (r.fundsCollected >= roundLimit) {
+            newRound();
+        }
+    }
+    
+}
+```
+### 2.3. Random Number Generation
+
+With so many functions relying on the generation of a random seed, developing a secure method for producing this information is critical for the success of the game. The airdrop model in Fomo3D, for example, is exploited at virtually zero risk by botters. They win close to, if not 100%, of the available airdrops. The primary issue with this model is that it generates randomness on-chain within a single transaction. Any version of this method is exploitable. Always.
+
+`Option`: A third party oracle service. Not recommended here because of high gas costs, high wait times on callbacks, and an off-chain trusted element.  
+
+`Option`: A Randao system that involves all participants to engage in a commit/reveal process. Not recommended here because of the friction produced by requiring multiple txs from each user.
+
+`Recommendation`: On-chain randomness using future block hash, by generating a single random number at the end of each mini-game (with two transactions separated by at least three blocks). Fast resolution could be incentivized by a small pot available to any user that processes the transaction. For example, 0.05 Ether could go to the first person who called the commit transaction at the end of a mini-game, and another 0.05 Ether for the person who called the resolve function after the eligible block delay (this also offsets user gas costs). This same tx will also set up token count for the next round. See the following example for a simple implementation of this idea in a basic five person lottery. Further discussion of the security issues related to RNGs can be found in section 3.2.
+
+Preliminary example of an implementation of future block hash, callable by any incentivized party:
+
+```solidity
+pragma solidity ^0.4.24;
+
+contract randomLotto {
+
+    address[] public players;
+    address public winner;
+    mapping (address => bool) knownAddress;
+    uint256 public count;
+    uint256 public limit = 5;
+    uint256 public blockCalled;
+    bool public buysBlocked = false;
+    bool public winnerPicked = false;
+    bool public winnerResolved = false;
+    bytes32 public hash1;
+    bytes32 public hash2;
+    
+    modifier noContracts {
+        require (msg.sender == tx.origin);
+        _;
+    } 
+    
+    function join() public payable noContracts {
+        require (knownAddress[msg.sender] == false);
+        require (count <= limit);
+        players.push(msg.sender);
+        knownAddress[msg.sender] == true;
+        count++;
+        if (count == limit) {
+            buysBlocked = true;
+        }
+    }
+    
+    function winningNumber() internal view returns(uint256){
+        bytes32 hash = keccak256(abi.encodePacked(players, hash1, hash2));
+        return uint256(hash) / now % 5;
+    }
+    
+    function pickWinner() public noContracts{
+        require (winnerPicked == false);
+        require (count == limit);
+        winnerPicked = true;
+        hash1 = blockhash(block.number);
+        blockCalled = block.number;
+    }
+    
+    function resolveWinner() public noContracts{
+        require (winnerResolved == false);
+        require (block.number >= blockCalled + 3);
+        hash2 = blockhash(blockCalled+3);
+        winner = players[winningNumber()];
+        winnerResolved = true;
+    }
+}
+```
+## 3. Security Concerns
+### 3.1. Blocking Smart Contracts
+
+Blocking contracts helps the security of the game by making token exploits and reentrancy attacks more difficult. More importantly, it makes exploiting random functions more challenging. 
+
+The general attack pattern against a contract that does not block external contract calls is: an external contract can repeat any single transaction with an on-chain random number generator, and then revert the transaction if the outcome is unfavorable. This allows attackers a zero-risk method of attempting any action where randomness determines the outcome. This process can easily be automated. 
+
+The two most common strategies for blocking smart contract interaction are:
+
+A) Checking `extcodesize`. This preventative measure can easily be overcome by an attacker calling the target function within the constructor, as the code size will be zero at that point in time. However, this attack only works if it can take place in a single transaction.
+
+B) Checking that `msg.sender == tx.origin`. While more robust, this method does not completely block contracts. For example, the "Wheel of Ether" attack allows a user to set up a separate contract and send two high gas transactions, one to the attacker's contract and the second to the target contract. If the first transaction's randomness check fails (producing a losing outcome) it will confirm. The balance of the attacker's address will now be too low and the second tx will fail. However, if the randomness check passes (winning outcome), the first tx will revert, allowing the second transaction to reach the target contract and confirm in the same block, while still passing the `tx.origin` test.
+
+`Recommendation`: Use the `require (msg.sender == tx.origin)` method in combination with a secure RNG
+
+### 3.2. Secure RNG 
+
+Any randomness generated on-chain in a single transaction can be exploited. With any amount of potential profit from such an attack, it is safe to assume that it will be exploited. Contract blocks are insufficient. 
+
+The best practice for securing random number generation uses two transactions. The first defines a block hash at a specified number of blocks in the future. The second confirms this block hash (and must be called within 256 blocks, which is as far back as this is freely accessible in the EVM). Because the future block hash is unknowable on the first transaction, it cannot be exploited by the above attack strategies. This strategy is only vulnerable to large scale miner collusion.
+
+The downside of this strategy is that it requires additional user input. Certain games that use a similar commit/resolve pattern, such as Zethr Dice, allow users to batch the two actions in a single transaction, reducing the friction of the additional tx. This pattern could be extended by allowing the resolve component to be called on the next valid transaction by any user, not just the one who sent the commit component. 
+
+### 3.3. Safe Withdrawal
+
+The safest pattern for user withdrawal is a pull method, where each unique address has a balance. Funds are only transferred out of the contract when a user initiates a withdrawal. Accounting is set up to prevent reentrancy exploits. This also prevents payout queues from stalling, for example if the transfer to a particular user ran out of gas, thereby freezing other transfers.
+
+### 3.4. Sybil Attacks
+
+`Challenge`: attackers will create many accounts in order to maximize their chances at winning the lottery.
+
+`Option`: EthVerify or a similar verification service.
+
+`Option`: Whitelist addresses.
+
+`Recommendation`: Make minimum token price sufficiently large to discourage malicious Sybil attacking buys (eg 10 TRX+).
+
+### 3.5. High Gas Abuse
+
+`Challenge`: Advanced users "snipe" new Mini-Games to guarantee a favorable position. Regular users who do not use super high gas prices become frustrated.
+
+`Option`: Hard cap gas price on all buys.
+
+`Option`: Decide this is not really a problem and take no action.
+
+`Recommendation`: Progressive gas tax, with taxed funds going to some community pot.
+
+Preliminary example of a scaled gas tax:
+
+```solidity
+function speedingTicket() internal returns(uint256 _adjustedBuy) {
+
+        uint256 taxedAmount;
+        uint256 adjustedBuy;
+        uint256 gasPriceGwei = SafeMaths.div(tx.gasprice, 1000000000);
+
+        if (gasPriceGwei >= 100 && gasPriceGwei < 200) {
+            taxedAmount = uint256(SafeMaths.div(SafeMaths.mul(msg.value, 2), 100));
+            adjustedBuy = msg.value - taxedAmount;
+        } else if (gasPriceGwei >= 200 && gasPriceGwei < 500) {
+            taxedAmount = uint256(SafeMaths.div(SafeMaths.mul(msg.value, 5), 100));
+            adjustedBuy = msg.value - taxedAmount;
+        } else if (gasPriceGwei >= 500 && gasPriceGwei < 2000) {
+            taxedAmount = uint256(SafeMaths.div(SafeMaths.mul(msg.value, 10), 100));
+            adjustedBuy = msg.value - taxedAmount;
+        } else if (gasPriceGwei >= 2000 && gasPriceGwei < 5000) {
+            taxedAmount = uint256(SafeMaths.div(SafeMaths.mul(msg.value, 20), 100));
+            adjustedBuy = msg.value - taxedAmount;
+        } else if (gasPriceGwei >= 5000) {
+            taxedAmount = uint256(SafeMaths.div(SafeMaths.mul(msg.value, 30), 100));
+            adjustedBuy = msg.value - taxedAmount;
+        } 
+	
+	uint256 communityFund += taxedAmount;
+	return adjustedBuy;
+}
+```
+
+### 3.6. Token Transfers
+
+Under/overflows caused by unchecked token transfer calls have caused the downfall of many smart contracts. While certainly possible to design securely, a safer and simpler model is to not allow the sale or transfer of tokens. This also means the tokens can be tracked with internal accounting only. They do not need to be ERC-20 compliant. The original purchasers will maintain their tokens (slashed at certain intervals).
