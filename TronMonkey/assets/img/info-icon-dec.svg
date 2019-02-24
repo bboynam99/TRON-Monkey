@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="17px" height="16px" viewBox="0 0 17 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.3 (57544) - http://www.bohemiancoding.com/sketch -->
+    <title>info-icon-dec</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="info-icon-dec" fill="#D2332B" fill-rule="nonzero">
+            <path d="M16.425,7.989 C16.425,12.323 12.912,15.835 8.579,15.835 C4.246,15.835 0.733,12.323 0.733,7.989 C0.733,3.656 4.246,0.143 8.579,0.143 C12.912,0.143 16.425,3.656 16.425,7.989 Z M7.356,13.589 L10.1,13.589 L10.1,6.227 L7.356,6.227 L7.356,13.589 Z M7.188,3.924 C7.188,4.779 7.875,5.464 8.728,5.464 C9.582,5.464 10.268,4.779 10.268,3.924 C10.268,3.071 9.582,2.385 8.728,2.385 C7.875,2.385 7.188,3.071 7.188,3.924 Z" id="Combined-Shape"></path>
+        </g>
+    </g>
+</svg>

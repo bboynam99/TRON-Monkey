@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="95px" height="95px" viewBox="0 0 95 95" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.3 (57544) - http://www.bohemiancoding.com/sketch -->
+    <title>Artboard Copy</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M17.6588903,47.6036094 C7.51754367,22.0167546 -0.401042034,0.601669609 0.0157256347,0.0454336351 C0.57141586,-0.371743346 17.1032001,2.13131854 36.6912805,5.60779338 L72.5333,12.1435661 L81.8411113,21.4605186 L91.01,30.9165302 L65.1704045,62.4829217 C50.8613812,79.8652959 38.4972737,94.0493133 37.6637384,94.0493133 C36.830203,94.1883723 27.9391594,73.1904642 17.6588903,47.6036094 Z" id="path-1"></path>
+        <path d="M39.3308091,56.920562 C40.5811121,46.7692555 41.4146474,38.2866569 41.1368023,38.0085389 C40.8589572,37.8694799 35.3020549,33.2805331 28.7726948,27.9962913 C10.2959948,12.838861 11.5462978,13.534156 13.7690587,19.0965157 C14.8804392,21.7386366 20.4373414,35.644536 26.1331662,49.9676123 C31.828991,64.1516297 36.5523579,75.6935261 36.6912805,75.5544671 C36.830203,75.4154081 38.0805061,67.0718685 39.3308091,56.920562 Z" id="path-3"></path>
+        <filter x="-1.7%" y="-0.8%" width="103.5%" height="101.7%" filterUnits="objectBoundingBox" id="filter-4">
+            <feOffset dx="1" dy="0" in="SourceAlpha" result="shadowOffsetInner1"></feOffset>
+            <feComposite in="shadowOffsetInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0.637436224   0 0 0 0 0.539121968   0 0 0 0 0  0 0 0 1 0" type="matrix" in="shadowInnerInner1"></feColorMatrix>
+        </filter>
+        <path d="M61.1416504,55.947149 C70.032694,45.2396065 76.9788218,36.3398309 76.8398993,36.061713 C76.4231316,35.644536 49.3332331,40.2334828 48.4996978,40.7897187 C47.805085,41.2068957 44.1930985,68.7405764 44.054176,73.1904642 C44.054176,74.9982311 44.3320211,76.2497621 44.6098662,75.9716441 C44.8877113,75.6935261 52.3895294,66.6546915 61.1416504,55.947149 Z" id="path-5"></path>
+        <filter x="-3.0%" y="-2.5%" width="106.1%" height="105.0%" filterUnits="objectBoundingBox" id="filter-6">
+            <feOffset dx="-2" dy="0" in="SourceAlpha" result="shadowOffsetInner1"></feOffset>
+            <feComposite in="shadowOffsetInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0.976470588   0 0 0 0 1   0 0 0 0 0  0 0 0 1 0" type="matrix" in="shadowInnerInner1"></feColorMatrix>
+        </filter>
+        <path d="M69.4770038,30.2212352 L79.0626602,28.4134683 L74.8949835,24.2416985 C70.1716166,19.5136927 69.7548489,19.6527517 59.3356572,28.8306453 C55.7236707,32.0290021 55.1679805,33.0024151 57.2518188,32.4461791 C58.7799669,32.1680611 64.3368692,31.0555892 69.4770038,30.2212352 Z" id="path-7"></path>
+        <filter x="-2.2%" y="-4.4%" width="104.3%" height="108.8%" filterUnits="objectBoundingBox" id="filter-8">
+            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetInner1"></feOffset>
+            <feComposite in="shadowOffsetInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0.976470588   0 0 0 0 1   0 0 0 0 0  0 0 0 1 0" type="matrix" in="shadowInnerInner1"></feColorMatrix>
+        </filter>
+        <path d="M53.9176775,24.3807575 C58.6410444,20.3480467 61.9751857,17.0106308 61.280573,16.7325129 C56.6961286,15.6200409 19.8816512,9.3623862 19.0481158,9.64050419 C17.9367354,10.0576812 42.5260279,31.3337072 44.3320211,31.4727662 C44.7487888,31.6118252 49.055388,28.4134683 53.9176775,24.3807575 Z" id="path-9"></path>
+        <filter x="-1.2%" y="-2.3%" width="102.4%" height="104.6%" filterUnits="objectBoundingBox" id="filter-10">
+            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetInner1"></feOffset>
+            <feComposite in="shadowOffsetInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0.976470588   0 0 0 0 1   0 0 0 0 0  0 0 0 1 0" type="matrix" in="shadowInnerInner1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Artboard-Copy" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Tron.network_logo" transform="translate(2.090000, 0.570000)">
+            <g id="Group">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <use id="Shape" fill="#8A1C75" fill-rule="nonzero" xlink:href="#path-1"></use>
+                <path d="M45.41,36.6200276 L45.2757762,37.6135774 L37.6487536,94.0702345 C23.4577054,78.3008986 14.1148116,64.8002509 9.62007224,53.5682914 C5.13193075,42.3528194 1.81828012,24.5093276 -0.0843467785,0.119753502 C-0.0862114455,0.095850532 15.0785708,12.2626086 45.41,36.6200276 Z" id="Path-2" fill="#F9FF00" fill-rule="nonzero" mask="url(#mask-2)"></path>
+                <path d="M45.41,36.6551071 L91.1203707,30.8981632 L75.2815295,6.49319662 C42.7459162,3.52188592 18.3391593,1.32380894 2.06125874,-0.101034318 C-14.2166418,-1.52587758 -14.921474,-1.52587758 -0.0532378181,-0.101034318 L0.343929338,0.197911747 L45.41,36.6551071 Z" id="Path-3" fill="#A7218D" fill-rule="nonzero" mask="url(#mask-2)"></path>
+                <path d="M45.41,36.6551071 L77.6628032,7.32510784 C43.5396741,3.79918966 18.3391593,1.32380894 2.06125874,-0.101034318 C-14.2166418,-1.52587758 -14.921474,-1.52587758 -0.0532378181,-0.101034318 L0.343929338,0.197911747 L45.41,36.6551071 Z" id="Path-3-Copy" fill="#8A1C75" fill-rule="nonzero" mask="url(#mask-2)"></path>
+            </g>
+            <g id="Path" fill-rule="nonzero">
+                <use fill="#68155C" xlink:href="#path-3"></use>
+                <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-3"></use>
+            </g>
+            <g id="Path" fill-rule="nonzero">
+                <use fill="#68155C" xlink:href="#path-5"></use>
+                <use fill="black" fill-opacity="1" filter="url(#filter-6)" xlink:href="#path-5"></use>
+            </g>
+            <g id="Path" fill-rule="nonzero">
+                <use fill="#68155C" xlink:href="#path-7"></use>
+                <use fill="black" fill-opacity="1" filter="url(#filter-8)" xlink:href="#path-7"></use>
+            </g>
+            <g id="Path" fill-rule="nonzero">
+                <use fill="#68155C" xlink:href="#path-9"></use>
+                <use fill="black" fill-opacity="1" filter="url(#filter-10)" xlink:href="#path-9"></use>
+            </g>
+        </g>
+    </g>
+</svg>

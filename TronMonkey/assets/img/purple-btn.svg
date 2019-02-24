@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="204px" height="45px" viewBox="0 0 204 45" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.3 (57544) - http://www.bohemiancoding.com/sketch -->
+    <title>Artboard 15</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Artboard-15" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-19">
+            <polygon id="Fill-1321" fill="#201F47" points="1.194 43.56 202.793 43.56 202.793 1.55 1.194 1.55"></polygon>
+            <path d="M2.194,42.56 L201.793,42.56 L201.793,2.55 L2.194,2.55 L2.194,42.56 Z M0.194,44.56 L203.793,44.56 L203.793,0.55 L0.194,0.55 L0.194,44.56 Z" id="Fill-1322" fill="#0A0B09"></path>
+            <polygon id="Fill-1323" fill="#A93378" points="9.794 35.72 194.192 35.72 194.192 9.39 9.794 9.39"></polygon>
+            <path d="M11.795,33.7 L11.795,33.35 L190.487,31.61 L192.192,11.39 L192.192,33.7 L11.795,33.7 Z M192.192,11.39 L192.192,11.74 L13.5,13.48 L11.795,33.7 L11.795,11.39 L192.192,11.39 Z M7.795,37.72 L196.192,37.72 L196.192,7.39 L7.795,7.39 L7.795,37.72 Z" id="Fill-1324" fill="#582963"></path>
+            <polyline id="Fill-1326" fill="#A93378" points="13.5 12.48 1.194 2.55 13.315 14.68 13.5 12.48"></polyline>
+            <polyline id="Fill-1327" fill="#A93378" points="191.192 33.7 203.498 43.64 191.377 31.51 191.192 33.7"></polyline>
+            <polyline id="Fill-1328" fill="#582963" points="191.192 12.48 203.498 2.55 191.377 14.68 191.192 12.48"></polyline>
+            <polyline id="Fill-1329" fill="#582963" points="13.5 33.7 1.194 43.64 13.315 31.51 13.5 33.7"></polyline>
+        </g>
+    </g>
+</svg>
