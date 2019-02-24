@@ -63,7 +63,7 @@ contract OneHundredthMonkey {
 	bool public gameActive = false;
 	bool public earlyResolveACalled = false;
 	bool public earlyResolveBCalled = false;
-	uint256 public activationTime = now; // (GMT): Saturday, February 20, 2019 5:00:00 PM
+	uint256 public activationTime = now; // (GMT): Saturday, March 9, 2019 5:00:00 PM
 	uint256 public miniGamesPerRound = 100; 
 	uint256 public miniGamesPerCycle = 10000; 
 	uint256 public miniGamePotRate = 25; //25%
@@ -71,8 +71,8 @@ contract OneHundredthMonkey {
 	uint256 public roundRewardRate = 20; //20%
 	uint256 public miniGameRewardRate = 15; //15%
 	uint256 public referralRate = 5; //5%
-	uint256 public miniGameAirdropRate = 8; //8%
-	uint256 public adminFeeRate = 2; //2%
+	uint256 public miniGameAirdropRate = 9; //9%
+	uint256 public adminFeeRate = 1; //1%
 	uint256 public roundPotRate = 50; //50% of progressive pot 
 	uint256 internal precisionFactor = 18; 
 	uint256 public seedAreward = 25000000000000000; 
