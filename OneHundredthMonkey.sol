@@ -63,22 +63,19 @@ contract OneHundredthMonkey {
 	bool public gameActive = false;
 	bool public earlyResolveACalled = false;
 	bool public earlyResolveBCalled = false;
-	uint256 public activationTime = now; // (GMT): Saturday, March 9, 2019 5:00:00 PM
-	uint256 public miniGamesPerRound = 100; 
-	uint256 public miniGamesPerCycle = 10000; 
-	uint256 public miniGamePotRate = 25; //25%
-	uint256 public progressivePotRate = 25; //25%
-	uint256 public roundRewardRate = 20; //20%
-	uint256 public miniGameRewardRate = 15; //15%
-	uint256 public referralRate = 5; //5%
-	uint256 public miniGameAirdropRate = 9; //9%
+	uint256 public activationTime = now; // (GMT): Saturday, March 9, 2019 5:00:00 PM 
+	uint256 public roundsPerCycle = 100; 
+	uint256 public roundPotRate = 30; //30%
+	uint256 public progressivePotRate = 30; //30%
+	uint256 public roundRewardRate = 30; //30%
+	uint256 public roundAirdropRate = 9; //9%
 	uint256 public adminFeeRate = 1; //1%
-	uint256 public roundPotRate = 50; //50% of progressive pot 
+	uint256 public cyclePotRate = 100; //100% of progressive pot 
 	uint256 internal precisionFactor = 18; 
 	uint256 public seedAreward = 25000000000000000; 
 	uint256 public seedBreward = 25000000000000000; 
-	mapping (uint256 => bool) public miniGameSeedAawarded;
-	mapping (uint256 => bool) public miniGameSeedBawarded;
+	mapping (uint256 => bool) public roundSeedAawarded;
+	mapping (uint256 => bool) public roundSeedBawarded;
 	
 	//RNG
 	uint256 internal RNGblockDelay = 1;
@@ -86,44 +83,27 @@ contract OneHundredthMonkey {
 	bytes32 internal hashA; 
 	bytes32 internal hashB; 
 
-	//MINIGAME TRACKING
-	bool public miniGameProcessing;
-	uint256 public miniGameCount;
-	uint256 public miniGameProcessingBegun;
-	mapping (uint256 => bool) public miniGamePrizeClaimed;
-	mapping (uint256 => bool) public miniGameAirdropClaimed;
-	mapping (uint256 => uint256) public miniGameStartTime;
-	mapping (uint256 => uint256) public miniGameEndTime;
-	mapping (uint256 => uint256) public miniGameTokens;
-	mapping (uint256 => uint256) public miniGameTokensLeft;
-	mapping (uint256 => uint256) public miniGameTokensActive;
-	mapping (uint256 => uint256) public miniGameTokenRangeMin;
-	mapping (uint256 => uint256) public miniGameTokenRangeMax;
-	mapping (uint256 => uint256) public miniGamePrizeNumber;
-	mapping (uint256 => uint256) public miniGameAirdropNumber;
-	mapping (uint256 => uint256) public miniGamePrizePot;
-	mapping (uint256 => uint256) public miniGameAirdropPot;
-	mapping (uint256 => uint256) public miniGameRewards;
-	mapping (uint256 => uint256) public miniGameRewardsClaimed;
-	mapping (uint256 => address) public miniGamePrizeWinner;
-	mapping (uint256 => address) public miniGameAirdropWinner;
-
 	//ROUND TRACKING
+	bool public roundProcessing;
 	uint256 public roundCount;
+	uint256 public roundProcessingBegun;
 	mapping (uint256 => bool) public roundPrizeClaimed;
-	mapping (uint256 => bool) public roundPrizeTokenRangeIdentified;
+	mapping (uint256 => bool) public roundAirdropClaimed;
 	mapping (uint256 => uint256) public roundStartTime;
 	mapping (uint256 => uint256) public roundEndTime;
 	mapping (uint256 => uint256) public roundTokens;
+	mapping (uint256 => uint256) public roundTokensLeft;
 	mapping (uint256 => uint256) public roundTokensActive;
 	mapping (uint256 => uint256) public roundTokenRangeMin;
 	mapping (uint256 => uint256) public roundTokenRangeMax;
 	mapping (uint256 => uint256) public roundPrizeNumber;
+	mapping (uint256 => uint256) public roundAirdropNumber;
 	mapping (uint256 => uint256) public roundPrizePot;
+	mapping (uint256 => uint256) public roundAirdropPot;
 	mapping (uint256 => uint256) public roundRewards;
 	mapping (uint256 => uint256) public roundRewardsClaimed;
-	mapping (uint256 => uint256) public roundPrizeInMinigame;
 	mapping (uint256 => address) public roundPrizeWinner;
+	mapping (uint256 => address) public roundAirdropWinner;
 
 	//CYCLE TRACKING
 	bool public cycleOver = false;
@@ -137,7 +117,6 @@ contract OneHundredthMonkey {
 	uint256 public cycleEnded;
 	uint256 public cycleProgressivePot;
 	uint256 public cyclePrizeWinningNumber;
-	uint256 public cyclePrizeInMinigame;
 	uint256 public cyclePrizeInRound;
 	uint256 public cycleStartTime;
 	address public cyclePrizeWinner;
@@ -145,28 +124,21 @@ contract OneHundredthMonkey {
 	//TOKEN TRACKING
 	uint256 public tokenPrice = 100 tron; 
 	uint256 public tokenPriceIncrement = 5 tron; 
-	uint256 public minTokensPerMiniGame = 2000; //between 1x and 2x this amount of tokens generated each minigame 
+	uint256 public minTokensPerRound = 2000; //between 1x and 2x this amount of tokens generated each minigame 
 
 	//USER TRACKING PUBLIC
 	address[] public uniqueAddress;
 	mapping (address => bool) public knownUsers;
 	mapping (address => uint256) public userTokens;
 	mapping (address => uint256) public userBalance;
-	mapping (address => mapping (uint256 => uint256)) public userMiniGameTokens;
 	mapping (address => mapping (uint256 => uint256)) public userRoundTokens;
-	mapping (address => mapping (uint256 => uint256[])) public userMiniGameTokensMin;
-	mapping (address => mapping (uint256 => uint256[])) public userMiniGameTokensMax;
+	mapping (address => mapping (uint256 => uint256[])) public userRoundTokensMin;
+	mapping (address => mapping (uint256 => uint256[])) public userRoundTokensMax;
 
 	//USER TRACKING INTERNAL
 	mapping (address => bool) public userCycleChecked;
-	mapping (address => uint256) public userLastMiniGameInteractedWith;
 	mapping (address => uint256) public userLastRoundInteractedWith;
-	mapping (address => uint256) public userLastMiniGameChecked;
 	mapping (address => uint256) public userLastRoundChecked;
-	mapping (address => mapping (uint256 => uint256)) public userShareMiniGame;
-	mapping (address => mapping (uint256 => uint256)) public userRewardsMiniGameTotal;
-	mapping (address => mapping (uint256 => uint256)) public userRewardsMiniGameClaimed;
-	mapping (address => mapping (uint256 => uint256)) public userRewardsMiniGameUnclaimed;
 	mapping (address => mapping (uint256 => uint256)) public userShareRound;
 	mapping (address => mapping (uint256 => uint256)) public userRewardsRoundTotal;
 	mapping (address => mapping (uint256 => uint256)) public userRewardsRoundClaimed;
@@ -201,8 +173,8 @@ contract OneHundredthMonkey {
 
 	modifier gameOpen() {
 		require (gameActive == true || now >= activationTime, "the game must be open");
-	  	if (miniGameProcessing == true) {
-	  		require (block.number > miniGameProcessingBegun + RNGblockDelay, "the round is still processing. try again soon");
+	  	if (roundProcessing == true) {
+	  		require (block.number > roundProcessingBegun + RNGblockDelay, "the round is still processing. try again soon");
 	  	}
 	  	_;
 	}
@@ -249,7 +221,7 @@ contract OneHundredthMonkey {
 	event userBought(
 		address indexed _user,
 		uint256 _tokensBought,
-		uint256 indexed _miniGameID,
+		uint256 indexed _roundID,
 		string _message
 	);
 
@@ -267,39 +239,32 @@ contract OneHundredthMonkey {
 
 	event processingStarted(
 		address indexed _caller,
-		uint256 indexed _miniGameID,
+		uint256 indexed _roundID,
 		uint256 _blockNumber,
 		string _message
 	);
 
 	event processingFinished(
 		address indexed _caller,
-		uint256 indexed _miniGameID,
+		uint256 indexed _roundID,
 		uint256 _blockNumber,
 		string _message
 	);
 
-	event newMinigameStarted(
-		uint256 indexed _miniGameID,
+	event newRoundStarted(
+		uint256 indexed _roundID,
 		uint256 _newTokens,
 		string _message
 	);
 
-	event miniGamePrizeAwarded(
-		uint256 indexed _miniGameID,
-		uint256 _winningNumber,
-		uint256 _prize,
-		string _message
-	);
-
-	event miniGameAirdropAwarded(
-		uint256 indexed _miniGameID,
-		uint256 _winningNumber,
-		uint256 _prize,
-		string _message
-	);
-
 	event roundPrizeAwarded(
+		uint256 indexed _roundID,
+		uint256 _winningNumber,
+		uint256 _prize,
+		string _message
+	);
+
+	event roundAirdropAwarded(
 		uint256 indexed _roundID,
 		uint256 _winningNumber,
 		uint256 _prize,
@@ -329,11 +294,11 @@ contract OneHundredthMonkey {
 
 
 	//this function begins resolving the round in the event that the game has stalled
-	//it can be called no sooner than 1 week after the start of a minigame 
-	//can only be called once. can be restarted with restartMiniGame if 256 blocks pass
+	//it can be called no sooner than 1 week after the start of a round
+	//can only be called once. can be restarted with restartRound if 256 blocks pass
 	function earlyResolveA() external onlyAdmins() onlyHumans() gameOpen() {
-		require (now > miniGameStartTime[miniGameCount] + 604800 && miniGameProcessing == false, "earlyResolveA cannot be called yet"); //1 week
-		require (miniGamePrizePot[miniGameCount].sub(seedAreward).sub(seedBreward) >= 0);
+		require (now > roundStartTime[roundCount] + 604800 && roundProcessing == false, "earlyResolveA cannot be called yet"); //1 week
+		require (roundPrizePot[roundCount].sub(seedAreward).sub(seedBreward) >= 0);
 		
 		gameActive = false;
 		earlyResolveACalled = true;
@@ -342,7 +307,7 @@ contract OneHundredthMonkey {
 
 	//this function comlpetes the resolution and ends the game 
 	function earlyResolveB() external onlyAdmins() onlyHumans() {
-		require (earlyResolveACalled == true && earlyResolveBCalled == false && miniGameProcessing == true && block.number > miniGameProcessingBegun + RNGblockDelay, "earlyResolveB cannot be called yet"); 
+		require (earlyResolveACalled == true && earlyResolveBCalled == false && roundProcessing == true && block.number > roundProcessingBegun + RNGblockDelay, "earlyResolveB cannot be called yet"); 
 		
 		earlyResolveBCalled = true;
 		resolveCycle();
@@ -351,17 +316,16 @@ contract OneHundredthMonkey {
 	}
 
 	//resets the first seed in case the processing is not completed within 256 blocks 
-	function restartMiniGame() external onlyAdmins() onlyHumans() {
-		require (miniGameProcessing == true && block.number > miniGameProcessingBegun + 256, "restartMiniGame cannot be called yet");
+	function restartRound() external onlyAdmins() onlyHumans() {
+		require (roundProcessing == true && block.number > roundProcessingBegun + 256, "restartRound cannot be called yet");
 		
 		generateSeedA();
 
-		emit processingRestarted(msg.sender, "mini-game processing was restarted");
+		emit processingRestarted(msg.sender, "round processing was restarted");
 	}
 
 	//admins can close the contract no sooner than 30 days after a full cycle completes 
 	//users need to withdraw funds before this date or risk losing them
-	//admins can not close the contract with user balance, all users need to withdraw rewards
 	function zeroOut() external onlyAdmins() onlyHumans() {
 	    require (now >= cycleEnded + 30 days && cycleOver == true, "too early to close the contract"); 
 	    
@@ -370,7 +334,6 @@ contract OneHundredthMonkey {
 
 	    selfdestruct(adminBank);
 	}
-
 
 	//////////////////
 	//USER FUNCTIONS//
@@ -398,7 +361,7 @@ contract OneHundredthMonkey {
 		
 		buyInternal(_amount, _referral);
 
-		emit userReinvested(msg.sender, _amount, "a user replayed");
+		emit userReplayed(msg.sender, _amount, "a user replayed");
 	}
 
 	function collect() external onlyHumans() {
@@ -416,24 +379,23 @@ contract OneHundredthMonkey {
 		emit userCollect(msg.sender, toTransfer, "a user withdrew");
 	}
 
-
 	//////////////////
 	//VIEW FUNCTIONS//
 	//////////////////
 
 	//helper function for front end token value
 	function getValueOfRemainingTokens() public view returns(uint256 _tokenValue){
-		return miniGameTokensLeft[miniGameCount].mul(tokenPrice);
-	}
-
-	//helper function for front end minigame prize pot
-	function getCurrentMinigamePrizePot() public view returns(uint256 _mgPrize){
-	    return miniGamePrizePot[miniGameCount];
+		return roundTokensLeft[roundCount].mul(tokenPrice);
 	}
 
 	//helper function for front end round prize pot
-	function getCurrentRoundPrizePot() public view returns(uint256 _rndPrize){
+	function getCurrentRoundPrizePot() public view returns(uint256 _RPrize){
 	    return roundPrizePot[roundCount];
+	}
+
+	//helper function for front cycle prize pot
+	function getCurrentCyclePrizePot() public view returns(uint256 _CYCPrize){
+	    return CYCPrizePot[roundCount];
 	}
 
 	//helper function to return contract balance 
@@ -441,15 +403,9 @@ contract OneHundredthMonkey {
 	    return address(this).balance;
 	}
 
-	//check for user divs available
+	//check for user rewards available
 	function checkUserRewardsAvailable(address _user) external view returns(uint256 _userRewardsAvailable) {
 		return userBalance[_user] + checkRewardsMgView(_user) + checkRewardsRndView(_user) + checkPrizesView(_user);
-	}
-
-	//user chance of winning minigame prize or airdrop
-	function userOddsMiniGame(address _user) external view returns(uint256) {
-		//returns percentage precise to two decimal places (eg 1428 == 14.28% odds)
-		return userMiniGameTokens[_user][miniGameCount].mul(10 ** 5).div(miniGameTokensActive[miniGameCount]).add(5).div(10);
 	}
 
 	//user chance of winning round prize or airdrop
@@ -464,37 +420,37 @@ contract OneHundredthMonkey {
 		return userTokens[_user].mul(10 ** 5).div(cycleActiveTokens).add(5).div(10);
 	}
 
-	//helper function for minigame data
-	function miniGameInfo() external view returns(
-		uint256 _id,
-		uint256 _miniGameTokens,
-		uint256 _miniGameTokensLeft,
-		uint256 _miniGamePrizePot,
-		uint256 _miniGameAirdropPot,
-		uint256 _miniGameStartTime
-		) {
-
-		return (
-			miniGameCount,
-			miniGameTokens[miniGameCount],
-			miniGameTokensLeft[miniGameCount],
-			miniGamePrizePot[miniGameCount],
-			miniGameAirdropPot[miniGameCount],
-			miniGameStartTime[miniGameCount]
-		);
-	}
-
 	//helper function for round data
 	function roundInfo() external view returns(
 		uint256 _id,
-		uint256 _roundPrize,
-		uint256 _roundStart
+		uint256 _roundTokens,
+		uint256 _roundTokensLeft,
+		uint256 _roundPrizePot,
+		uint256 _roundAirdropPot,
+		uint256 _roundStartTime
 		) {
 
 		return (
 			roundCount,
-			cycleProgressivePot / 2,
+			roundTokens[roundCount],
+			roundTokensLeft[roundCount],
+			roundPrizePot[roundCount],
+			roundAirdropPot[roundCount],
 			roundStartTime[roundCount]
+		);
+	}
+
+	//helper function for cycle data
+	function cycleInfo() external view returns(
+		uint256 _id,
+		uint256 _cyclePrize,
+		uint256 _cycleStart
+		) {
+
+		return (
+			roundCount,
+			cycleProgressivePot / 1,
+			cycleStartTime[roundCount]
 		);
 	}
 
@@ -522,14 +478,13 @@ contract OneHundredthMonkey {
 	function cycleInfo() external view returns(
 		bool _cycleComplete,
 		uint256 _currentRound,
-		uint256 _currentMinigame,
 		uint256 _tokenSupply,
 		uint256 _progressivePot,
 		bool _prizeClaimed,
 		uint256 _winningNumber
 		) {
 		bool isActive;
-		if (miniGameCount < 1000) {
+		if (roundCount < 100) {
 			isActive = true;
 			} else {
 				isActive = false;
@@ -538,7 +493,6 @@ contract OneHundredthMonkey {
 		return (
 			isActive,
 			roundCount,
-			miniGameCount,
 			tokenSupply,
 			cycleProgressivePot,
 			cylcePrizeClaimed,
@@ -557,14 +511,13 @@ contract OneHundredthMonkey {
 		gameActive = true;
 		cycleStart();
 		roundStart();
-		miniGameStart();
 
 		emit cycleStarted(msg.sender, "a new cycle just started"); 
 	}
 
 	function buyInternal(uint256 _amount, address _referral) internal {
 		require (_amount >= tokenPrice, "you must buy at least one token");
-		require (userMiniGameTokensMin[msg.sender][miniGameCount].length < 10, "you are buying too often in this round"); //sets up bounded loop 
+		require (userRoundTokensMin[msg.sender][roundCount].length < 10, "you are buying too often in this round"); //sets up bounded loop 
 
 		//start cycle on first buy
 		if (gameActive == false && now >= activationTime) {
@@ -572,13 +525,13 @@ contract OneHundredthMonkey {
 		}
 
 		//update rewards here to prevent overwriting userLastRoundInteractedWith
-		if (userLastRoundInteractedWith[msg.sender] < roundCount || userLastMiniGameInteractedWith[msg.sender] < miniGameCount || miniGameProcessing == false) {
+		if (userLastRoundInteractedWith[msg.sender] < roundCount || userLastRoundInteractedWith[msg.sender] < roundCount || roundProcessing == false) {
 			updateUserBalance(msg.sender);
 		}
 
 		//if this is the first tx after processing period is over, call generateSeedB
-		//update user balance here to solve edge case of same user ending a minigame and starting the next
-		if (miniGameProcessing == true && block.number > miniGameProcessingBegun + RNGblockDelay) {
+		//update user balance here to solve edge case of same user ending a round and starting the next
+		if (roundProcessing == true && block.number > roundProcessingBegun + RNGblockDelay) {
 			generateSeedB();
 			updateUserBalance(msg.sender);
 		}
@@ -592,15 +545,15 @@ contract OneHundredthMonkey {
 		//assign tokens
 		uint256 tokensPurchased;
 		uint256 tronSpent = _amount;
-		uint256 valueOfRemainingTokens = miniGameTokensLeft[miniGameCount].mul(tokenPrice);
+		uint256 valueOfRemainingTokens = roundTokensLeft[miniGameCount].mul(tokenPrice);
 
 		//if round tokens are all sold, push difference to user balance and call generateSeedA
 		if (tronSpent >= valueOfRemainingTokens) {
 			uint256 incomingValue = tronSpent;
 			tronSpent = valueOfRemainingTokens;
-			tokensPurchased = miniGameTokensLeft[miniGameCount];
-			miniGameTokensLeft[miniGameCount] = 0;
-			uint256 tronCredit = incomingValue.sub(ethSpent);
+			tokensPurchased = roundTokensLeft[roundCount];
+			roundTokensLeft[roundCount] = 0;
+			uint256 tronCredit = incomingValue.sub(tronSpent);
 			userBalance[msg.sender] += ethCredit;
 			generateSeedA();
 		} else {
@@ -609,81 +562,49 @@ contract OneHundredthMonkey {
 
 		//update user token accounting
 		userTokens[msg.sender] += tokensPurchased;
-		userMiniGameTokens[msg.sender][miniGameCount] += tokensPurchased;
-		userRoundTokens[msg.sender][roundCount] += tokensPurchased;
+		roundGameTokens[msg.sender][roundCount] += tokensPurchased;
 		//add min ranges and save in user accounting
-		userMiniGameTokensMin[msg.sender][miniGameCount].push(cycleActiveTokens + 1);
-		userMiniGameTokensMax[msg.sender][miniGameCount].push(cycleActiveTokens + tokensPurchased);
+		userRoundTokensMin[msg.sender][roundCount].push(cycleActiveTokens + 1);
+		userRoundTokensMax[msg.sender][roundCount].push(cycleActiveTokens + tokensPurchased);
 		//log last eligible rounds for withdraw checking 
-		userLastMiniGameInteractedWith[msg.sender] = miniGameCount;
 		userLastRoundInteractedWith[msg.sender] = roundCount;	
-
-		uint256 referralShare = (tronSpent.mul(referralRate)).div(100);
-		//check referral
-			if (_referral != 0x0000000000000000000000000000000000000000 && _referral != msg.sender) {
-	      // assign refferal
-	      userBalance[_referral] += referralShare;
-	   	} else if (_referral == 0x0000000000000000000000000000000000000000 || _referral == msg.sender){
-	   		//if no referral used, add to progessive pot 
-	   		cycleProgressivePot += referralShare;
-	   	}
 
 		//divide amount by various percentages and distribute
 		uint256 adminShare = (tronSpent.mul(adminFeeRate)).div(100);
 		adminBalance += adminShare;
 
-		uint256 mgRewards = (tronSpent.mul(miniGameRewardRate)).div(100);
-		miniGameDivs[miniGameCount] += mgDivs;
-
 		uint256 roundRewardShare = tronSpent.mul(roundRewardRate).div(100);
 		roundDivs[roundCount] += roundDivShare;
 
-		uint256 miniGamePrize = tronSpent.mul(miniGamePotRate).div(100);
-		miniGamePrizePot[miniGameCount] += miniGamePrize;
+		uint256 roundPrize = tronSpent.mul(roundPotRate).div(100);
+		roundPrizePot[roundCount] += roundPrize;
 
-		uint256 miniGameAirdrop = tronSpent.mul(miniGameAirdropRate).div(100);
-		miniGameAirdropPot[miniGameCount] += miniGameAirdrop;
+		uint256 roundAirdrop = tronSpent.mul(roundAirdropRate).div(100);
+		roundAirdropPot[roundCount] += roundAirdrop;
 
 		uint256 cyclePot = tronSpent.mul(progressivePotRate).div(100);
 		cycleProgressivePot += cyclePot;
 
      	//update global token accounting 
-     	if (miniGameTokensLeft[miniGameCount] > 0) {
-			miniGameTokensLeft[miniGameCount] = miniGameTokensLeft[miniGameCount].sub(tokensPurchased);
+     	if (roundTokensLeft[roundCount] > 0) {
+			roundTokensLeft[roundCount] = roundTokensLeft[roundCount].sub(tokensPurchased);
 		}
 		cycleActiveTokens += tokensPurchased;
 		roundTokensActive[roundCount] += tokensPurchased;
-		miniGameTokensActive[miniGameCount] += tokensPurchased;
+		roundTokensActive[roundCount] += tokensPurchased;
 		totalVolume += tronSpent;
 		totalBuys++;
 
-        //update user balance, if necessary. done here to keep ensure updateUserBalance never has to search through multiple minigames 
+        //update user balance, if necessary. done here to keep ensure updateUserBalance never has to search through multiple rounds 
 		updateUserBalance(msg.sender);
 
-		emit userBought(msg.sender, tokensPurchased, miniGameCount, "a user just bought tokens");
+		emit userBought(msg.sender, tokensPurchased, roundCount, "a user just bought tokens");
 	}
 
 	function checkRewards(address _user) internal {
 		//set up local shorthand
-		uint256 _mg = userLastMiniGameInteractedWith[_user];
 		uint256 _rnd = userLastRoundInteractedWith[_user];
 
-		//calculate minigame rewards 
-		userShareMiniGame[_user][_mg] = userMiniGameTokens[_user][_mg].mul(10 ** (precisionFactor + 1)).div(miniGameTokens[_mg] + 5).div(10);
-	    userRewardsMiniGameTotal[_user][_mg] = miniGameRewards[_mg].mul(userShareMiniGame[_user][_mg]).div(10 ** precisionFactor);
-	    userRewardsMiniGameUnclaimed[_user][_mg] = userRewardsMiniGameTotal[_user][_mg].sub(userRewardsMiniGameClaimed[_user][_mg]);
-	    //add to user balance
-	    if (userRewardsMiniGameUnclaimed[_user][_mg] > 0) {
-			//sanity check
-			assert(userRewardsMiniGameUnclaimed[_user][_mg] <= miniGameRewards[_mg]);
-			assert(userRewardsMiniGameUnclaimed[_user][_mg] <= address(this).balance);
-			//update user accounting
-			userRewardsMiniGameClaimed[_user][_mg] = userRewardsMiniGameTotal[_user][_mg];
-			uint256 shareTempMg = userRewardsMiniGameUnclaimed[_user][_mg];
-			userRewardsMiniGameUnclaimed[_user][_mg] = 0;
-			userBalance[_user] += shareTempMg;
-			miniGameRewardsClaimed[_mg] += shareTempMg;
-		    }
 	    //calculate round rewards 
 		userShareRound[_user][_rnd] = userRoundTokens[_user][_rnd].mul(10 ** (precisionFactor + 1)).div(roundTokensActive[_rnd] + 5).div(10);
 	    userRewardsRoundTotal[_user][_rnd] = roundRewards[_rnd].mul(userShareRound[_user][_rnd]).div(10 ** precisionFactor);
@@ -704,17 +625,17 @@ contract OneHundredthMonkey {
 
 	function checkPrizes(address _user) internal {
 		//don't check for prizes on the first buy of the round
-		if (miniGameProcessing == false) {
+		if (roundProcessing == false) {
 			//push cycle prizes to persistent storage
 			if (cycleOver == true && userCycleChecked[_user] == false) {
-				//get minigame cycle prize was in 
-				uint256 mg = cyclePrizeInMinigame;
+				//get round cycle prize was in 
+				uint256 mg = cyclePrizeInRound;
 				//check if user won cycle prize 
-				if (cylcePrizeClaimed == false && userMiniGameTokensMax[_user][mg].length > 0) {
-					//check if user won minigame 
+				if (cylcePrizeClaimed == false && userRoundTokensMax[_user][mg].length > 0) {
+					//check if user won round 
 					//loop iterations bounded to a max of 10 on buy()
-		  			for (uint256 i = 0; i < userMiniGameTokensMin[_user][mg].length; i++) {
-		  				if (cyclePrizeWinningNumber >= userMiniGameTokensMin[_user][mg][i] && cyclePrizeWinningNumber <= userMiniGameTokensMax[_user][mg][i]) {
+		  			for (uint256 i = 0; i < userRoundTokensMin[_user][mg].length; i++) {
+		  				if (cyclePrizeWinningNumber >= userRoundTokensMin[_user][rnd][i] && cyclePrizeWinningNumber <= userRoundTokensMax[_user][rnd][i]) {
 		  					userBalance[_user] += cycleProgressivePot;
 		  					cylcePrizeClaimed = true;
 							cyclePrizeWinner = msg.sender;				
@@ -726,12 +647,12 @@ contract OneHundredthMonkey {
 			}
 			//push round prizes to persistent storage
 			if (roundPrizeClaimed[userLastRoundInteractedWith[_user]] == false && roundPrizeTokenRangeIdentified[userLastRoundInteractedWith[_user]]) {
-				//get minigame round prize was in 
+				//get round prize was in 
 				uint256 rnd = userLastRoundInteractedWith[_user];
-				uint256 mgp = roundPrizeInMinigame[rnd];
+				uint256 mgp = roundPrizeInRound[rnd];
 				//check if user won round prize
 				for (i = 0; i < userMiniGameTokensMin[_user][mgp].length; i++) {
-					if (roundPrizeNumber[rnd] >= userMiniGameTokensMin[_user][mgp][i] && roundPrizeNumber[rnd] <= userMiniGameTokensMax[_user][mgp][i]) {
+					if (roundPrizeNumber[rnd] >= userRoundTokensMin[_user][rnd][i] && roundPrizeNumber[rnd] <= userRoundTokensMax[_user][rnd][i]) {
 						userBalance[_user] += roundPrizePot[mgp];
 						roundPrizeClaimed[rnd] = true;
 						roundPrizeWinner[rnd] = msg.sender;		
@@ -740,29 +661,18 @@ contract OneHundredthMonkey {
 				}
 				userLastRoundChecked[_user] = userLastRoundInteractedWith[_user];
 			}
-			//push minigame prizes to persistent storage
-			if (userLastMiniGameChecked[_user] < userLastMiniGameInteractedWith[_user] && miniGameCount >= userLastMiniGameInteractedWith[_user] && miniGamePrizeClaimed[userLastMiniGameInteractedWith[_user]] == false) {
-				//check if user won minigame 
-				mg = userLastMiniGameInteractedWith[_user];
-				for (i = 0; i < userMiniGameTokensMin[_user][mg].length; i++) {
-					if (miniGamePrizeNumber[mg] >= userMiniGameTokensMin[_user][mg][i] && miniGamePrizeNumber[mg] <= userMiniGameTokensMax[_user][mg][i]) {
-						userBalance[_user] += miniGamePrizePot[mg];
-						miniGamePrizeClaimed[mg] = true;
-						miniGamePrizeWinner[mg] = msg.sender;			
-						break;
-					}
-				}
+
 				//check if user won airdrop
-				for (i = 0; i < userMiniGameTokensMin[_user][mg].length; i++) {
-					if (miniGameAirdropNumber[mg] >= userMiniGameTokensMin[_user][mg][i] && miniGameAirdropNumber[mg] <= userMiniGameTokensMax[_user][mg][i]) {
-						userBalance[_user] += miniGameAirdropPot[mg];
-						miniGameAirdropClaimed[mg] = true;
-						miniGameAirdropWinner[mg] = msg.sender;
+				for (i = 0; i < userRoundTokensMin[_user][rnd].length; i++) {
+					if (roundAirdropNumber[rnd] >= userRoundTokensMin[_user][rnd][i] && mroundAirdropNumber[rnd] <= userRoundTokensMax[_user][rnd][i]) {
+						userBalance[_user] += mroundAirdropPot[rnd];
+						roundAirdropClaimed[rnd] = true;
+						roundAirdropWinner[rnd] = msg.sender;
 						break;
 					}
 				}
-				//update last mini game checked 
-				userLastMiniGameChecked[_user] = userLastMiniGameInteractedWith[_user];
+				//update last round checked 
+				userLastRoundChecked[_user] = userLastRoundInteractedWith[_user];
 			}
 		}
 	}
@@ -772,55 +682,37 @@ contract OneHundredthMonkey {
 		checkPrizes(_user);
 	}
 
-	function miniGameStart() internal {
+	function roundStart() internal {
 		require (cycleOver == false, "the cycle cannot be over");
 		
-		miniGameCount++;
-		miniGameStartTime[miniGameCount] = now;
-		//set up special case for correct token range on first minigame 
+		roundCount++;
+		roundStartTime[roundCount] = now;
+		//set up special case for correct token range on first round
 		if (tokenSupply != 0) {
-			miniGameTokenRangeMin[miniGameCount] = tokenSupply + 1;
+			roundTokenRangeMin[roundCount] = tokenSupply + 1;
 		} else {
-			miniGameTokenRangeMin[miniGameCount] = 0;
+			roundTokenRangeMin[roundCount] = 0;
 		}
 		//generate tokens and update accounting 
-		miniGameTokens[miniGameCount] = generateTokens();
-		miniGameTokensLeft[miniGameCount] = miniGameTokens[miniGameCount];
-		miniGameTokenRangeMax[miniGameCount] = tokenSupply;
-		//increment token price after 1st minigame 
-		if (miniGameCount > 1) {
+		roundTokens[roundCount] = generateTokens();
+		roundTokensLeft[roundCount] = roundTokens[roundCount];
+		roundTokenRangeMax[roundCount] = tokenSupply;
+		//increment token price after 1st round 
+		if (roundCount > 1) {
 			tokenPrice += tokenPriceIncrement;
 		}
 		//award prizes and start new round if current round is complete 
-		if (miniGameCount % miniGamesPerRound == 0 && miniGameCount > 1) {
+		if (roundCount % roundPerRound == 0 && mroundCount > 1) {
 			awardRoundPrize();
 			roundStart();
 			tokenPrice = 100 tron + 5 tron * roundCount.sub(1);
 		}
 		//award prize if cycle is complete 
-		if (miniGameCount % (miniGamesPerCycle + 1) == 0 && miniGameCount > 1) {
+		if (roundCount % (roundPerCycle + 1) == 0 && roundCount > 1) {
 			awardCyclePrize();
 		}
 
-		emit newMinigameStarted(miniGameCount, miniGameTokens[miniGameCount], "new minigame started");
-	}
-
-	function roundStart() internal {
-		require (cycleOver == false, "the cycle cannot be over");
-
-		roundCount++;
-		roundStartTime[roundCount] = now;
-		//set up special case for correct token range on first round 
-		if (tokenSupply != 0) {
-			roundTokenRangeMin[roundCount] = miniGameTokenRangeMax[miniGameCount.sub(1)] + 1;
-		} else {
-			roundTokenRangeMin[roundCount] = 0;
-		}
-		//log max only when round is complete 
-		if (roundCount >= 2) {
-			roundTokenRangeMax[roundCount.sub(1)] = miniGameTokenRangeMax[miniGameCount.sub(1)];
-			roundTokens[roundCount.sub(1)] = tokenSupply.sub(roundTokenRangeMin[roundCount.sub(1)]);
-		}
+		emit newRoundStarted(roundCount, roundTokens[roundCount], "new round started");
 	}
 
 	function cycleStart() internal {
@@ -832,108 +724,85 @@ contract OneHundredthMonkey {
 
 	function generateTokens() internal returns(uint256 _tokens) {
 		bytes32 hash = keccak256(abi.encodePacked(salt, hashA, hashB));
-		uint256 randTokens = uint256(hash).mod(minTokensPerMiniGame);
-    	uint256 newMinGameTokens = randTokens + minTokensPerMiniGame;
-		tokenSupply += newMinGameTokens;
+		uint256 randTokens = uint256(hash).mod(minTokensPerRound);
+    	uint256 newRoundTokens = randTokens + minTokensPerRound;
+		tokenSupply += newRoundTokens;
 		salt++;
 
-		return newMinGameTokens;
+		return newRoundTokens;
 	}
 
 	function generateSeedA() internal {
-		require (miniGameProcessing == false || miniGameProcessing == true && block.number > miniGameProcessingBegun + 256, "seed A cannot be regenerated right now");
-		require (miniGameTokensLeft[miniGameCount] == 0 || earlyResolveACalled == true, "active tokens remain in this minigame");
+		require (roundProcessing == false || roundProcessing == true && block.number > roundProcessingBegun + 256, "seed A cannot be regenerated right now");
+		require (roundTokensLeft[roundCount] == 0 || earlyResolveACalled == true, "active tokens remain in this round");
 		
-		miniGameProcessing = true;
-		miniGameProcessingBegun = block.number;
+		roundProcessing = true;
+		roundProcessingBegun = block.number;
 		//generate seed 
-		hashA = blockhash(miniGameProcessingBegun - 1);
+		hashA = blockhash(roundProcessingBegun - 1);
 		//log end times
-		if (miniGameCount > 1) {
-			miniGameEndTime[miniGameCount] = now;
-		}
-		if (miniGameCount % miniGamesPerRound == 0) {
+		if (roundCount > 1) {
 			roundEndTime[roundCount] = now;
 		}
+		if (roundCount % roundPerCycle == 0) {
+			cylceEndTime[cycleCount] = now;
+		}
 		//award processing bounty
-		if (miniGameSeedAawarded[miniGameCount] == false) {
+		if (roundSeedAawarded[roundCount] == false) {
 			userBalance[msg.sender] += seedAreward;
-			miniGameSeedAawarded[miniGameCount] = true;
+			roundSeedAawarded[roundCount] = true;
 		}
 		salt++;
 
-		emit processingStarted(msg.sender, miniGameCount, block.number, "processing started");
+		emit processingStarted(msg.sender, roundCount, block.number, "processing started");
 	}
 
 	function generateSeedB() internal {
 		//gererate seed 
-		hashB = blockhash(miniGameProcessingBegun + RNGblockDelay);
+		hashB = blockhash(roundProcessingBegun + RNGblockDelay);
 		//awared prizes 
-		awardMiniGamePrize();
-		awardMiniGameAirdrop();
+		awardRoundPrize();
+		awardRoundAirdrop();
 		//award processing bounty 
-		if (miniGameSeedBawarded[miniGameCount] == false) {
+		if (roundSeedBawarded[roundCount] == false) {
 			userBalance[msg.sender] += seedBreward;
-			miniGameSeedBawarded[miniGameCount] = true;
+			roundSeedBawarded[roundCount] = true;
 		}
-		//start next minigame
-		miniGameStart();
-		miniGameProcessing = false;
+		//start next round
+		roundStart();
+		roundProcessing = false;
 		salt++;
 
-		emit processingFinished(msg.sender, miniGameCount, block.number, "processing finished");
-	}
-
-	function awardMiniGamePrize() internal {
-		bytes32 hash = keccak256(abi.encodePacked(salt, hashA, hashB));
-	    uint256 winningNumber = uint256(hash).mod(miniGameTokens[miniGameCount].sub(miniGameTokensLeft[miniGameCount]));
-	    miniGamePrizeNumber[miniGameCount] = winningNumber + miniGameTokenRangeMin[miniGameCount];
-	    miniGamePrizePot[miniGameCount] = miniGamePrizePot[miniGameCount].sub(seedAreward).sub(seedBreward);
-	    salt++;
-
-	    emit miniGamePrizeAwarded(miniGameCount, winningNumber, miniGamePrizePot[miniGameCount], "minigame prize awarded");
-	}
-
-	function awardMiniGameAirdrop() internal {
-		bytes32 hash = keccak256(abi.encodePacked(salt, hashA, hashB));
-	    uint256 winningNumber = uint256(hash).mod(miniGameTokens[miniGameCount].sub(miniGameTokensLeft[miniGameCount]));
-	    miniGameAirdropNumber[miniGameCount] = winningNumber + miniGameTokenRangeMin[miniGameCount];
-	    salt++;
-
-	    emit miniGameAirdropAwarded(miniGameCount, winningNumber, miniGameAirdropPot[miniGameCount], "minigame airdrop awarded");
+		emit processingFinished(msg.sender, roundCount, block.number, "processing finished");
 	}
 
 	function awardRoundPrize() internal {
 		bytes32 hash = keccak256(abi.encodePacked(salt, hashA, hashB));
-		uint256 currentRoundTokens;
-		if (miniGameCount > 1) {
-			currentRoundTokens = miniGameTokenRangeMax[miniGameCount.sub(1)].sub(roundTokenRangeMin[roundCount]);
-		//handles edge case of early resolve during the first minigame 
-		} else if (miniGameCount == 1) {
-			currentRoundTokens = miniGameTokensActive[1];
-		}
-	    uint256 winningNumber = uint256(hash).mod(currentRoundTokens);
+	    uint256 winningNumber = uint256(hash).mod(roundTokens[roundCount].sub(roundTokensLeft[roundCount]));
 	    roundPrizeNumber[roundCount] = winningNumber + roundTokenRangeMin[roundCount];
-	    //calculate round prize here 
-	    uint256 roundPrize = cycleProgressivePot.mul(roundPotRate).div(100);
-		uint256 adminShare = cycleProgressivePot.mul(4).div(100);
-		foundationBalance += adminShare;
-	    roundPrizePot[roundCount] = roundPrize;
-	    cycleProgressivePot = roundPrize;
-	    narrowRoundPrize(roundCount);
+	    roundPrizePot[roundCount] = roundPrizePot[roundCount].sub(seedAreward).sub(seedBreward);
 	    salt++;
 
-		emit roundPrizeAwarded(roundCount, winningNumber, roundPrize, "round prize awarded");
+	    emit roundPrizeAwarded(roundCount, winningNumber, roundPrizePot[mroundCount], "round prize awarded");
+	}
+
+	function awardRoundeAirdrop() internal {
+		bytes32 hash = keccak256(abi.encodePacked(salt, hashA, hashB));
+	    uint256 winningNumber = uint256(hash).mod(roundTokens[roundCount].sub(roundTokensLeft[roundCount]));
+	    roundAirdropNumber[roundCount] = winningNumber + roundTokenRangeMin[roundCount];
+	    salt++;
+
+	    emit roundAirdropAwarded(roundCount, winningNumber, roundAirdropPot[roundCount], "round airdrop awarded");
 	}
 
 	function awardCyclePrize() internal {
 		bytes32 hash = keccak256(abi.encodePacked(salt, hashA, hashB));
 	    uint256 winningNumber;
-	    if (miniGameCount > 1) {
-	    	winningNumber = uint256(hash).mod(miniGameTokenRangeMax[miniGameCount - 1]);
-	    //handles edge case of early resolve during the first minigame 
-	    } else if (miniGameCount == 1) {
-	    	winningNumber = uint256(hash).mod(miniGameTokensActive[1]);
+	    if (roundCount > 1) {
+	    	winningNumber = uint256(hash).mod(roundTokenRangeMax[roundCount - 1]);
+	    //handles edge case of early resolve during the first round 
+	    } else if (roundCount == 1) {
+	    	winningNumber = uint256(hash).mod(roundTokensActive[1]);
 	    }
 	    cyclePrizeWinningNumber = winningNumber;
 	    gameActive = false;
@@ -949,43 +818,42 @@ contract OneHundredthMonkey {
 		//generate hashB here in instead of calling generateSeedB
 		hashB = blockhash(miniGameProcessingBegun + RNGblockDelay);
 		//award prizes 
-		awardMiniGamePrize();
-		awardMiniGameAirdrop();
-		awardRoundPrize();
+		awardRounddPrize();
+		awardRoundAirdrop();
 		awardCyclePrize();
 		//close game
-		miniGameProcessing = false;
+		roundProcessing = false;
 		gameActive = false;
 	}
 
-	//narrows down the token range of a round to a specific miniGame
+	//narrows down the token range of a round to a specific round
 	//reduces the search space on user prize updates 
-	function narrowRoundPrize(uint256 _ID) internal returns(uint256 _miniGameID) {
+	function narrowRoundPrize(uint256 _ID) internal returns(uint256 _roundID) {
 		//set up local accounting
-		uint256 miniGameRangeMin; 
-		uint256 miniGameRangeMax;
+		uint256 roundRangeMin; 
+		uint256 roundRangeMax;
 		if (_ID == 1) {
-			miniGameRangeMin = 1;
-			miniGameRangeMax = miniGamesPerRound;
+			roundRangeMin = 1;
+			roundRangeMax = roundPerRound;
 		} else if (_ID >= 2) {
-			miniGameRangeMin = _ID.mul(miniGamesPerRound);
-			miniGameRangeMax = miniGameRangeMin + miniGamesPerRound - 1;
+			roundRangeMin = _ID.mul(roundPerRound);
+			roundRangeMax = roundRangeMin + roundsPerRound - 1;
 		}	
-		//loop through each minigame to check prize number
+		//loop through each mround to check prize number
 		//log globaly so this only needs to be called once per prize 
-	    for (uint256 i = miniGameRangeMin; i <= miniGameRangeMax; i++) {
-		    if (roundPrizeNumber[_ID] >= miniGameTokenRangeMin[i] && roundPrizeNumber[_ID] <= miniGameTokenRangeMax[i]) {
-	        roundPrizeInMinigame[_ID] = i;
-	        roundPrizeTokenRangeIdentified[_ID] = true;
-	        return roundPrizeInMinigame[_ID];
+	    for (uint256 i = roundRangeMin; i <= roundRangeMax; i++) {
+		    if (cyclePrizeNumber[_ID] >= roundTokenRangeMin[i] && cyclePrizeNumber[_ID] <= roundTokenRangeMax[i]) {
+	        cyclePrizeInRound[_ID] = i;
+	        cyclePrizeTokenRangeIdentified[_ID] = true;
+	        return cyclePrizeInRound[_ID];
 	        break;
 		    }
 	    }	
 	}
 
-	//narrows down the token range of a round to a specific miniGame
+	//narrows down the token range of a cycle to a specific round
 	//reduces the search space on user prize updates 
-	function narrowCyclePrize() internal returns(uint256 _miniGameID) {
+	function narrowCyclePrize() internal returns(uint256 _roundID) {
 		//first identify round 
 		//if resolving in first round, don't bother searching
 		if (roundCount == 1) {
@@ -1002,52 +870,37 @@ contract OneHundredthMonkey {
 		    }
 		}
 	    //set up minigame local accounting 
-	    uint256 miniGameRangeMin; 
-		uint256 miniGameRangeMax;
+	    uint256 roundRangeMin; 
+		uint256 roundRangeMax;
 		uint256 _ID = cyclePrizeInRound;
 		if (_ID == 1) {
-			miniGameRangeMin = 1;
-			miniGameRangeMax = miniGamesPerRound;
+			roundRangeMin = 1;
+			roundRangeMax = roundPerCycle;
 		} else if (_ID >= 2) {
-			miniGameRangeMin = _ID.mul(miniGamesPerRound);
-			miniGameRangeMax = miniGameRangeMin + miniGamesPerRound - 1;
+			roundRangeMin = _ID.mul(roundPerCycle);
+			roundRangeMax = roundRangeMin + roundPerRound - 1;
 		}	
-		//loop through each minigame to check prize number
+		//loop through each round to check prize number
 		//log globaly so this only needs to be called once per prize  
-	    for (i = miniGameRangeMin; i <= miniGameRangeMax; i++) {
-			if (cyclePrizeWinningNumber >= miniGameTokenRangeMin[i] && cyclePrizeWinningNumber <= miniGameTokenRangeMax[i]) {
-				cyclePrizeInMinigame = i;
+	    for (i = roundRangeMin; i <= roundRangeMax; i++) {
+			if (cyclePrizeWinningNumber >= roundTokenRangeMin[i] && cyclePrizeWinningNumber <= roundTokenRangeMax[i]) {
+				cyclePrizeInRound = i;
 				cyclePrizeTokenRangeIdentified = true;
-				return cyclePrizeInMinigame;
+				return cyclePrizeInRound;
 				break;
 			}
 	    }	
 	}
 
 	//helper function for up to date front end balances without state change
-	function checkRewardsMgView(address _user) internal view returns(uint256 _rewards) {
-		//set up local shorthand
-		uint256 _mg = userLastMiniGameInteractedWith[_user];
-		uint256 mgShare = userShareMiniGame[_user][_mg];
-		uint256 mgTotal = userRewardsMiniGameTotal[_user][_mg];
-		uint256 mgUnclaimed = userRewardsMiniGameUnclaimed[_user][_mg];
-		//calculate minigame rewards 
-		mgShare = userMiniGameTokens[_user][_mg].mul(10 ** (precisionFactor + 1)).div(miniGameTokens[_mg] + 5).div(10);
-	    mgTotal = miniGameRewards[_mg].mul(mgShare).div(10 ** precisionFactor);
-	    mgUnclaimed = mgTotal.sub(userRewardsMiniGameClaimed[_user][_mg]);
-
-	    return mgUnclaimed;
-	}
-	
-	//helper function for up to date front end balances without state change
-	function checkRewardsRndView(address _user) internal view returns(uint256 _divs) {
+	function checkRewardsRNDView(address _user) internal view returns(uint256 _rewards) {
 		//set up local shorthand
 		uint256 _rnd = userLastRoundInteractedWith[_user];
 		uint256 rndShare = userShareRound[_user][_rnd];
 		uint256 rndTotal = userRewardsRoundTotal[_user][_rnd];
 		uint256 rndUnclaimed = userRewardsRoundUnclaimed[_user][_rnd];
-        //calculate round rewards 
-		rndShare = userRoundTokens[_user][_rnd].mul(10 ** (precisionFactor + 1)).div(roundTokensActive[_rnd] + 5).div(10);
+		//calculate round rewards 
+		rndShare = userRoundTokens[_user][_rnd].mul(10 ** (precisionFactor + 1)).div(roundTokens[_rnd] + 5).div(10);
 	    rndTotal = roundRewards[_rnd].mul(rndShare).div(10 ** precisionFactor);
 	    rndUnclaimed = rndTotal.sub(userRewardsRoundClaimed[_user][_rnd]);
 
@@ -1060,20 +913,20 @@ contract OneHundredthMonkey {
 		uint256 prizeValue;
 		//push cycle prizes to persistent storage
 		if (cycleOver == true && userCycleChecked[_user] == false) {
-			//get minigame cycle prize was in 
-			uint256 mg;
+			//get round cycle prize was in 
+			uint256 rnd;
 			if (cyclePrizeTokenRangeIdentified == true) {
-				mg = cyclePrizeInMinigame;
+				mg = cyclePrizeInRound;
 			} else {
 				narrowCyclePrizeView();
-				mg = cyclePrizeInMinigame;
+				mg = cyclePrizeInRound;
 			}
 			//check if user won cycle prize 
-			if (cylcePrizeClaimed == false && userMiniGameTokensMax[_user][mg].length > 0) {
-				//check if user won minigame 
+			if (cylcePrizeClaimed == false && userRoundTokensMax[_user][rnd].length > 0) {
+				//check if user won round
 				//loop iterations bounded to a max of 10 on buy()
-				for (uint256 i = 0; i < userMiniGameTokensMin[_user][mg].length; i++) {
-					if (cyclePrizeWinningNumber >= userMiniGameTokensMin[_user][mg][i] && cyclePrizeWinningNumber <= userMiniGameTokensMax[_user][mg][i]) {
+				for (uint256 i = 0; i < userRoundTokensMin[_user][rnd].length; i++) {
+					if (cyclePrizeWinningNumber >= userRoundTokensMin[_user][rnd][i] && cyclePrizeWinningNumber <= userRoundTokensMax[_user][rnd][i]) {
 						prizeValue += cycleProgressivePot;			
 						break;
 					}
@@ -1082,37 +935,37 @@ contract OneHundredthMonkey {
 		}
 		//push round prizes to persistent storage
 		if (userLastRoundChecked[_user] < userLastRoundInteractedWith[_user] && roundCount > userLastRoundInteractedWith[_user]) {
-			//get minigame round prize was in 
-			uint256 mgp;
+			//get round prize was in 
+			uint256 rndp;
 			uint256 _ID = userLastRoundChecked[_user];
 			if (roundPrizeTokenRangeIdentified[_ID] == true) {
-				mgp = roundPrizeInMinigame[_ID];
+				rndp = roundPrizeInRound[_ID];
 			} else {
 				narrowRoundPrizeView(_ID);
-				mgp = roundPrizeInMinigame[_ID];
+				rndp = roundPrizeInRound[_ID];
 			}
 			//check if user won round prize
-			for (i = 0; i < userMiniGameTokensMin[_user][mgp].length; i++) {
-				if (roundPrizeNumber[_ID] >= userMiniGameTokensMin[_user][mgp][i] && roundPrizeNumber[_ID] <= userMiniGameTokensMax[_user][mgp][i]) {
-					prizeValue += roundPrizePot[mgp];	
+			for (i = 0; i < userRoundTokensMin[_user][rndp].length; i++) {
+				if (roundPrizeNumber[_ID] >= userRoundTokensMin[_user][rndp][i] && roundPrizeNumber[_ID] <= userRoundTokensMax[_user][rndp][i]) {
+					prizeValue += roundPrizePot[rndp];	
 					break;
 				}
 			}
 		}
-		//push minigame prizes to persistent storage
-		if (userLastMiniGameChecked[_user] < userLastMiniGameInteractedWith[_user] && miniGameCount >= userLastMiniGameInteractedWith[_user] && miniGamePrizeClaimed[userLastMiniGameInteractedWith[_user]] == false) {
-				//check if user won minigame 
-			mg = userLastMiniGameInteractedWith[_user];
-			for (i = 0; i < userMiniGameTokensMin[_user][mg].length; i++) {
-				if (miniGamePrizeNumber[mg] >= userMiniGameTokensMin[_user][mg][i] && miniGamePrizeNumber[mg] <= userMiniGameTokensMax[_user][mg][i]) {
-					prizeValue += miniGamePrizePot[mg];			
+		//push round prizes to persistent storage
+		if (userLastRoundChecked[_user] < userLastRoundInteractedWith[_user] && roundeCount >= userLastRoundInteractedWith[_user] && roundPrizeClaimed[userLastRoundInteractedWith[_user]] == false) {
+				//check if user won round
+			rnd = userLastRoundInteractedWith[_user];
+			for (i = 0; i < userRoundTokensMin[_user][rnd].length; i++) {
+				if (roundPrizeNumber[mg] >= userRoundTokensMin[_user][rnd][i] && roundPrizeNumber[rnd] <= userRoundTokensMax[_user][rnd][i]) {
+					prizeValue += roundPrizePot[rnd];			
 					break;
 				}
 			}
 			//check if user won airdrop
-			for (i = 0; i < userMiniGameTokensMin[_user][mg].length; i++) {
-				if (miniGameAirdropNumber[mg] >= userMiniGameTokensMin[_user][mg][i] && miniGameAirdropNumber[mg] <= userMiniGameTokensMax[_user][mg][i]) {
-					prizeValue += miniGameAirdropPot[mg];
+			for (i = 0; i < userRoundTokensMin[_user][rnd].length; i++) {
+				if (roundAirdropNumber[mg] >= userRoundTokensMin[_user][rnd][i] && roundAirdropNumber[rnd] <= userRoundTokensMax[_user][rnd][i]) {
+					prizeValue += roundAirdropPot[mg];
 					break;
 				}
 			}
