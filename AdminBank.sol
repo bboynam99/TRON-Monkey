@@ -1,6 +1,6 @@
 pragma solidity ^0.4.25;
 
-//LIBRARIES
+//LIBRARIES TRON ADMIN BANK
 
 library SafeMath {
 
@@ -36,13 +36,13 @@ library SafeMath {
 	 }
 }
 
-//CONTRACT INTERFACE
+//CONTRACT INTERFACE TRON ADMIN BANK
 
 contract OneHundredthMonkey {
  	function adminWithdraw() public {}	
 }
 
-//MAIN CONTRACT
+//MAIN CONTRACT TRON ADMIN BANK
 
 contract AdminBank {
 
@@ -55,11 +55,13 @@ contract AdminBank {
 	address public mainContract;
 	bool public mainContractSet = false;
 
-	address public teamMemberA = THiB7NdXDNaVVFBDwvsQNpxfDCG2HGRNvF; 
-	address public teamMemberB = TMHWmHeYaMyeP4E9j4hbCvveE2tF5hWNre; 
+	address public teamMemberA = Th; 
+	address public teamMemberB = Th; 
+	address public teamMemberC = Th; 
 	
-	uint256 public teamMemberArate = 50; //50%
-	uint256 public teamMemberBrate = 50; //50%
+	uint256 public teamMemberArate = 40; //40%
+	uint256 public teamMemberBrate = 40; //40%
+	uint256 public teamMemberCrate = 20; //20%
 
 
 	mapping (address => uint256) public teamMemberTotal;
@@ -76,6 +78,7 @@ contract AdminBank {
 		masterAdmin = msg.sender;
 		validTeamMember[teamMemberA] = true;
 		validTeamMember[teamMemberB] = true;
+		validTeamMember[teamMemberC] = true;
 		
 	}
 
@@ -123,7 +126,7 @@ contract AdminBank {
 		address _new
 	);
 
-	//FUNCTIONS
+	//FUNCTIONS TRON ADMIN BANK
 
 	//add main contract address 
 	function setContractAddress(address _address) external onlyHumans() {
@@ -151,6 +154,9 @@ contract AdminBank {
 		} else if (msg.sender == teamMemberB) {
 			user = teamMemberB;
 			rate = teamMemberBrate;
+		} else if (msg.sender == teamMemberC) {
+			user = teamMemberC;
+			rate = teamMemberCrate;
 		}
 		
 		//update accounting 
@@ -178,6 +184,8 @@ contract AdminBank {
 			proposingAddressIndex[_new] = 0;
 		} else if (msg.sender == teamMemberB) {
 			proposingAddressIndex[_new] = 1;
+		} else if (msg.sender == teamMemberC) {
+			proposingAddressIndex[_new] = 2;
 		} 
 
 		emit addressChangeProposed(msg.sender, _new);
@@ -213,13 +221,19 @@ contract AdminBank {
 			isProposing[old] = false;
 			teamMemberB = msg.sender;
 			validTeamMember[teamMemberB] = true;
+		} else if (proposingAddressIndex[msg.sender] == 2) {
+			old = teamMemberC;
+			validTeamMember[old] = false;
+			isProposing[old] = false;
+			teamMemberB = msg.sender;
+			validTeamMember[teamMemberC] = true;
 		} 
 		isProposedAddress[msg.sender] = false;
 
 		emit addressChanged(old, msg.sender);
 	}
 
-	//VIEW FUNCTIONS
+	//VIEW FUNCTIONS TRON ADMIN BANK
 
 	function balanceOf(address _user) public view returns(uint256 _balance) {
 		address user;
@@ -230,6 +244,9 @@ contract AdminBank {
 		} else if (_user == teamMemberB) {
 			user = teamMemberB;
 			rate = teamMemberBrate;
+		} else if (_user == teamMemberC) {
+			user = teamMemberC;
+			rate = teamMemberCrate;
 		} 
 		{
 			return 0;
@@ -245,7 +262,7 @@ contract AdminBank {
 	    return address(this).balance;
 	}
 
-	//FALLBACK
+	//FALLBACK TRON ADMIN BANK
 
 	function () public payable {
 		fundsReceived += msg.value;
