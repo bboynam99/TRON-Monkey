@@ -124,7 +124,7 @@ contract OneHundredthMonkey {
     //TOKEN TRACKING
     uint256 public tokenPrice = 100 tron;
     uint256 public tokenPriceIncrement = 5 tron;
-    uint256 public minTokensPerRound = 2000; //between 1x and 2x this amount of tokens generated each minigame
+    uint256 public minTokensPerRound = 1000; //between 1x and 2x this amount of tokens generated each minigame
 
     //USER TRACKING PUBLIC
     address[] public uniqueAddress;
