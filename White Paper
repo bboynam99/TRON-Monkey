@@ -1,18 +1,25 @@
 # Final-Release
 1.DEVELOPMENT IDEA
 
-The hundredth monkey effect is a hypothetical phenomenon in which a new behavior or idea is claimed to spread rapidly by unexplained means from one group to all related groups once a critical number of members of one group exhibit the new behavior or acknowledge the new idea.[1]  -  Amundson, Ron (Summer 1985). Kendrick Frazier, ed. "The Hundredth Monkey Phenomenon". Skeptical Inquirer: 348–356.
+The hundredth monkey effect is a hypothetical phenomenon in which a new behavior or idea is claimed to spread rapidly by 
+unexplained means from one group to all related groups once a critical number of members of one group exhibit the new behavior
+or acknowledge the new idea.[1]  -  Amundson, Ron (Summer 1985). Kendrick Frazier, ed. 
+"The Hundredth Monkey Phenomenon". Skeptical Inquirer: 348–356.
 
 2.INTRODUCTION
 
-100th Monkey is a much needed breath of fresh air to the dAPP space.  It is a revolutionary progressive pot game with 3 different styles of airdrops, mini-game block winners, mini-game reward earners, progressive round rewards and then large round pots that will progressively get larger as people continue to buy in.  The goal of the game is to create a fair opportunity for the players to play unlimited rounds at their leisure and not be limited by huge in-dAPP price increases or time limits.  The contract is going to revolutionize how random numbers are created and used in the smart contract space. 
+100th Monkey is a much needed breath of fresh air to the dAPP space.  
+It is a revolutionary progressive pot game with airdrop pot, round pot, 100th monkey cycle pot, 
+and round rewards.  The goal of the game is to create a fair opportunity for the players to play unlimited rounds at their 
+leisure and not be limited by huge in-dAPP price increases or time limits.  The contract is going to revolutionize how random 
+numbers are created and used in the smart contract space. 
 
 3.TEAM (Discord Names)
   1. Project Manager – MILO
-  2. Founders – borsky, MILO, Yobo
-  3. Lead Developers – Nightman(OG Contract Dev), Yobo, MILO
+  2. Founders – Borsky, MILO, Yobo
+  3. Lead Developers – Nightman(OG), ka06 , Yobo, MILO, Zzomrot
   4. Illustrator – Chase3000
-  5. Game and Tech Contributors – Erdrickk
+  5. Game and Tech Contributors – Borsky(Bubs)
   6. Marketing Team - TBD
 
 4.GAMEPLAY
@@ -27,17 +34,17 @@ The hundredth monkey effect is a hypothetical phenomenon in which a new behavior
   Please note, during your use of this site, that online gambling is an entertainment vehicle, and that it carries with it a certain degree of financial risk. Players should be aware of this risk, and govern themselves accordingly. All users of this site should exercise responsibility when playing in online casinos, lotteries, and dAPPS. CIRCUS FREAKS PRODUCTIONS have undertaken the appropriate steps to inform all those interested in online gaming about the dangers of excess play; that could potentially result from such an activity. There is nothing contained herein that constitutes a guarantee of winning, nor is there an intention to induce anyone into violating any local, state or national laws. Recognizing that the laws and regulations involving online gaming are different everywhere, readers are advised to check with the laws that exist within their own jurisdiction to ascertain the legality of the activities which are covered.
 
 6.DEFINITIONS AND ACRONYMS
-1.  BT – Banana Token, each individual in dAPP purchase, represents a unit of chance toward all the air drops and pots.  A person’s banana token ownership also determines their split of the MG Rewards and RND Rewards.  Banana tokens are created by our random number creation system at the beginning of each mini-game (between 10,000 and 20,000) banana tokens will be minted at the beginning of each mini-game.  
+1.  BT – Banana Token, each individual in dAPP purchase, represents a unit of chance toward all the air drops and pots. 
 2.  RND – Round, a round consists of 2000 Banana Tokens.  Once all the BT are purchased in a round, the round will choose a winner.
 3.  MPF – Monkey Pot Function of contract.  Will be explained in the Monkey Pot section.
 4.  CYC – Cycle, one cycle consists of 100 Rounds.  At the end of each cycle, the 100th Monkey Pot Cycle function will be activated.
 5.  MPCF – Monkey Pot Cycle Function – activated when one 
 6.  CYCR – CYCLE rewards.  30% of all purchases into the game up to that point will be split evenly between all players in that current rounD proportionally to their banana token ownership in a cycle.
-7.  MG AD – Mini-game airdrop, is 9% of all MG buy ins, and is paid out to one lucky wallet holder per MG.(Single Winner)
+7.  RND AD – Round airdrop, is 9% of all RND buy ins, and is paid out to one lucky wallet holder per RND.(Single Winner)
 8.  DF – Development Fee.  This fee will go to the large development team for continued structure development, UI’s, Wallets, Mobile Apps and marketing for the project.  This project is a new contract, not a clone, and the development team will use these funds appropriately to pay for individuals time and sweat equity in the project. This is 1% of all Tron into the project. 
-9.  MP – The 100th Monkey Pot – is the progressive pot that builds up over every 100 mini-games.
-10. RND MP – Round 100th Monkey Pot – at the end of a round the monkey pot which is built on 30% of all BT purchases in the RND.  When the end of round is functioned (last BT token purchased of the 100th MG) a random winner will be selected.  The winner will get 50% of the pot, 50% will seed the monkey pot for the next round.
-11. CYC MP – Cycle 100th Monkey Pot – the grand pot.  The pot will be paid out completely after 100 rounds of 100 mini-games. 100% of the pot will be paid out to one winner or 3 winners depending on community feedback.
+9.  MP – The 100th Monkey Pot – is the progressive pot that builds up over every 100 rounds.
+10. RND MP – Round 100th Monkey Pot – at the end of a round the monkey pot which is built on 30% of all BT purchases in the RND.  When the end of round is functioned (last BT token purchased of the 100th RND) a random winner will be selected.  The winner will get 50% of the pot, 50% will seed the monkey pot for the next round.
+11. CYC MP – Cycle 100th Monkey Pot – the grand pot.  The pot will be paid out completely after 100 rounds. 100% of the pot will be paid out to one winner or 3 winners depending on community feedback.
 
 7.RULES
 1.	A 100th Monkey Game cycle will involve 100 rounds. The contract is set up so that the game will continue to go on without intervention for as long as people are playing.  This will be explained more in price scaling.
@@ -45,10 +52,10 @@ The hundredth monkey effect is a hypothetical phenomenon in which a new behavior
 3.	The first round token pricing will start at 100 TRX / BT. Price scaling will be explained in the next section. 
 4.	The minimum buy in is 1 BT, there is no maximum buy in.  it is not advantageous for a whale to buy out a whole round though.
 5.	Upon each purchase the spent TRX will be divided as follows.  (30% Round Pot, 9% Round Air Drop, 30% Cycle Rewards, 30% Monkey Pot, 1% Dev Fee)
-6.	30% Round Pot will go to a random selected winner of each mini-game.                                                            
-7.	8%  Round Airdrop will go to a random selected winner of each mini-game.                                                                                                                                             
+6.	30% Round Pot will go to a random selected winner of each round.                                                            
+7.	8%  Round Airdrop will go to a random selected winner of each round.                                                                                                                                             
 8.	30% Cycle Rewards - will be split up between all players within the  cycle(all previous rounds)
-9.	30% to the Progressive Pot.  This will keep being added to the current mini-game pot so that the game grows.      
+9.	30% to the Progressive Pot which is paid out at the end.     
 10.	The first round will fire the percentage splits.  Subsequent rounds will be fired as a combination between purchased (new TRX) into the game + carry over totals.
 11.	At the end of 1 CYC, all of the BT’s will be burned and new BT will be minted for a new CYC.  Similar to how your powerball ticket is only good for the week of play.  There is no time limit to this game, it will fire when the minted BT’s have been consumed through purchase.
 12.	The game is intended to last 100 rounds. Then a new CYC will start back to the original scaling.                                                                                                                      
@@ -68,7 +75,7 @@ BT Price Scaling Examples(CYC:RND):
   1.	Players are eligible to win in several ways (for this example we will use 2000 BT / RND)
   2.	Cycle Rewards, players who purchase BT will receive 30% CYCR and that is split up between all present players in that round and all RND in a CYC. 
   3.	RND - Airdrops – One player per RND has the option to win the 9% airdrop.  Every player has a 1/2000 chance per BT that they own in that RND. 
-  4.	RND MP – 30% of all MG’s go into the MP.  Winner(1) will win 100% of that pot. 
+  4.	RND MP – 30% of all BT’s go into the MP.  Winner(1) will win 100% of that pot. 
   5.	CYC MP - Cycle 100th Monkey Pot – the grand pot(30% of each RND for 100 RNDS).  The pot will be paid out completely after 100 rounds. 100% of the pot will be paid out, then a new cycle will begin.
 
 10.MARKETING
