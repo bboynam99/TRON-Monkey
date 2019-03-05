@@ -28,66 +28,55 @@ The hundredth monkey effect is a hypothetical phenomenon in which a new behavior
 
 6.DEFINITIONS AND ACRONYMS
 1.  BT – Banana Token, each individual in dAPP purchase, represents a unit of chance toward all the air drops and pots.  A person’s banana token ownership also determines their split of the MG Rewards and RND Rewards.  Banana tokens are created by our random number creation system at the beginning of each mini-game (between 10,000 and 20,000) banana tokens will be minted at the beginning of each mini-game.  
-2.  MG – Mini-game, each small block of the game that is closed out once all the random created tokens have been purchased from that allotment.  
-3.  RND – Round, a round consists of 100 mini-games.  At the end of each round the 100th Monkey Pot function will be activated. 
-4.  MPF – Monkey Pot Function of contract.  Will be explained in the Monkey Pot section.
-5.  CYC – Cycle, one cycle consists of 100 Rounds.  At the end of each cycle, the 100th Monkey Pot Cycle function will be activated.
-6.  MPCF – Monkey Pot Cycle Function – activated when one 
-7.  MG W – Mini-game winner.  25% of each mini-game purchased TRX goes to one BT token holder from that MG.
-8.  MGR – Mini-game rewards.  15% of all purchases into a mini-game will be redistributed as rewards to the banana token holders only in that MG.
-9.  RNDR – Round rewards.  20% of all purchases into the game up to that point will be split evenly between all players in that current round(xx MG’s) proportionally to their banana token ownership.
-10. MG AD – Mini-game airdrop, is 8% of all MG buy ins, and is paid out to one lucky wallet holder per MG.(Single Winner)
-11. DF – Development Fee.  This fee will go to the large development team for continued structure development, UI’s, Wallets, Mobile Apps and marketing for the project.  This project is a new contract, not a clone, and the development team will use these funds appropriately to pay for individuals time and sweat equity in the project. This is 2% of all Tron into the project. 
-12. MP – The 100th Monkey Pot – is the progressive pot that builds up over every 100 mini-games.
-13. RND MP – Round 100th Monkey Pot – at the end of 100 Mini-games the monkey pot which is built on 25% of all BT purchases in the RND.  When the end of round is functioned (last BT token purchased of the 100th MG) a random winner will be selected.  The winner will get 48% of the pot, 48% will seed the monkey pot for the next round.  4% will go to the foundation fund.
-14. CYC MP – Cycle 100th Monkey Pot – the grand pot.  The pot will be paid out completely after 100 rounds of 100 mini-games. 100% of the pot will be paid out to one winner or 3 winners depending on community feedback.
+2.  RND – Round, a round consists of 2000 Banana Tokens.  Once all the BT are purchased in a round, the round will choose a winner.
+3.  MPF – Monkey Pot Function of contract.  Will be explained in the Monkey Pot section.
+4.  CYC – Cycle, one cycle consists of 100 Rounds.  At the end of each cycle, the 100th Monkey Pot Cycle function will be activated.
+5.  MPCF – Monkey Pot Cycle Function – activated when one 
+6.  CYCR – CYCLE rewards.  30% of all purchases into the game up to that point will be split evenly between all players in that current rounD proportionally to their banana token ownership in a cycle.
+7.  MG AD – Mini-game airdrop, is 9% of all MG buy ins, and is paid out to one lucky wallet holder per MG.(Single Winner)
+8.  DF – Development Fee.  This fee will go to the large development team for continued structure development, UI’s, Wallets, Mobile Apps and marketing for the project.  This project is a new contract, not a clone, and the development team will use these funds appropriately to pay for individuals time and sweat equity in the project. This is 1% of all Tron into the project. 
+9.  MP – The 100th Monkey Pot – is the progressive pot that builds up over every 100 mini-games.
+10. RND MP – Round 100th Monkey Pot – at the end of a round the monkey pot which is built on 30% of all BT purchases in the RND.  When the end of round is functioned (last BT token purchased of the 100th MG) a random winner will be selected.  The winner will get 50% of the pot, 50% will seed the monkey pot for the next round.
+11. CYC MP – Cycle 100th Monkey Pot – the grand pot.  The pot will be paid out completely after 100 rounds of 100 mini-games. 100% of the pot will be paid out to one winner or 3 winners depending on community feedback.
 
 7.RULES
-1.	A 100th Monkey Game cycle will involve 100 rounds of 100 mini-games. The contract is set up so that the game will continue to go on without intervention for as long as people are playing.  This will be explained more in price scaling.
-2.	Each MG will randomly mint 2000 - 4000 BT.                                 
-3.	The first mini-game block pricing will start at 100 TRX / BT. Price scaling will be explained in the next section. 
-4.	The minimum buy in is 1 BT, there is no maximum buy in.  it is not advantageous for a whale to buy out a whole round though, but they may buy out several MG’s to increase their chances at the monkey pot at the end of the round or cycle.
-5.	Upon each purchase the spent TRX will be divided as follows.  (25% Mini-Game Pot, 8% MG Air Drop, 5% Referral, 15% Mini-game Rewards, 25% Progressive Pot, 20% Round DRewards, 2% Dev Fee)
-6.	25% Mini-Game Pot will go to a random selected winner of each mini-game.                                                            
-7.	8%  Mini-Game Airdrop will go to a random selected winner of each mini-game.                                                                     
-10.	15% Mini-game rewards - will be split up between all players within the mini-game.                                                                        
-11.	20% Round Rewards - will be split up between all players within the  round(all previous mini-games)
-12.	25% to the Progressive Pot.  This will keep being added to the current mini-game pot so that the game grows.      
-13.	The first mini-game will fire the percentage splits.  Subsequent mini-games will be fired as a combination between purchased (new TRX) into the game + carry over totals.
-14.	At the end of 1 RND, all of the BT’s will be burned and new BT will be minted for a new RND.  Similar to how your powerball ticket is only good for the week of play.  There is no time limit to this game, it will fire when the minted BT’s have been consumed through purchase.
-15.	The game is intended to last 100 rounds of 100 mini-games.                                                                                                                      
-16.	In the event the game goes state, which it certainly won't, we will have the power to resolve and relaunch.
+1.	A 100th Monkey Game cycle will involve 100 rounds. The contract is set up so that the game will continue to go on without intervention for as long as people are playing.  This will be explained more in price scaling.
+2.	Each RND will randomly mint 2000 BT.                                 
+3.	The first round token pricing will start at 100 TRX / BT. Price scaling will be explained in the next section. 
+4.	The minimum buy in is 1 BT, there is no maximum buy in.  it is not advantageous for a whale to buy out a whole round though.
+5.	Upon each purchase the spent TRX will be divided as follows.  (30% Round Pot, 9% Round Air Drop, 30% Cycle Rewards, 30% Monkey Pot, 1% Dev Fee)
+6.	30% Round Pot will go to a random selected winner of each mini-game.                                                            
+7.	8%  Round Airdrop will go to a random selected winner of each mini-game.                                                                                                                                             
+8.	30% Cycle Rewards - will be split up between all players within the  cycle(all previous rounds)
+9.	30% to the Progressive Pot.  This will keep being added to the current mini-game pot so that the game grows.      
+10.	The first round will fire the percentage splits.  Subsequent rounds will be fired as a combination between purchased (new TRX) into the game + carry over totals.
+11.	At the end of 1 CYC, all of the BT’s will be burned and new BT will be minted for a new CYC.  Similar to how your powerball ticket is only good for the week of play.  There is no time limit to this game, it will fire when the minted BT’s have been consumed through purchase.
+12.	The game is intended to last 100 rounds. Then a new CYC will start back to the original scaling.                                                                                                                      
+13.	In the event the game goes stale, which it certainly won't, we will have the power to resolve and relaunch.  The resolve function pays out the players, not the dev team.  After resolution, a 30 day waiting period is written in contract to allow all players to pull out their rewards.
 
 8.PRICE SCALING AND LONGEVITY
-Banana tokens will start off at 100 TRX / BT for the genesis mini-game.  Each subsequent MG will have the token price increase by 5 TRX / BT / MG. Once one cycle is completed the Banana Tokens will start back off at 5 TRX higher in price than the RND before.  Here is a couple of scaling examples denoted in CYC:RND:MG to determine where you are in the game.  If people keep playing the contract will go on an on as long as the Tron network.
-BT Price Scaling Examples(CYC:RND:MG):
-  1.	1:1:1 = 100 TRX / BT
-  2.	1:1:2 = 105 TRX / BT
-  3.	1:1:100 = 595 TRX / BT
-  4.	1:2:1 = 105 TRX / BT
-  5.	1:2:2 = 110 TRX / BT
-  6.	1:2:100 = 600 TRX / BT
+Banana tokens will start off at 100 TRX / BT for the genesis round.  Each subsequent RND will have the token price increase by 5 TRX / BT / RND. Once one cycle is completed the Banana Tokens will start back off at original BT price.  Here is a couple of scaling examples denoted in CYC:RND to determine where you are in the game.  If people keep playing the contract will go on an on as long as the Tron network.
+BT Price Scaling Examples(CYC:RND):
+  1.	1:1 = 100 TRX / BT
+  2.	1:2 = 105 TRX / BT
+  3.	1:100 = 595 TRX / BT
+  4.	2:1 = 100 TRX / BT
+  5.	2:2 = 105 TRX / BT
+  6.	2:100 = 595 TRX / BT
 
 9.INCENTIVES TO PLAY
-1.	Players are eligible to win in several ways (for this example we will use 3000 BT / MG)
-  1.  Referral links will be used, you can earn 5% of your referred players buy in.
-  2.  Mini-game rewards, only players within the minigame will get 15% rewards of all buys in that mini-game.  So automatically you retain back 10% of the mini-game proportional to your token holdings. So if you spend 100 TRX in MG1 you would get 15 TRX back in MG Rewards. MGR is a flat reward rate.
-  3.	Round Rewards, players who purchase BT will receive 20% RNDR and that is split up between all present players in that round. RNDR is a decreasing reward as the value of the buy ins are split up over more tokens as the game progresses.
-  4.	MG- Airdrops – One player per MG has the option to win the 8% airdrop.  Every player has a 1/3000 chance per BT that they own in that mini-game. 
-  5.	MG Winners will win 25% of the MG TRX buy ins, goes to a single token holder from that MG.
-  6.	RND MP – 25% of all MG’s go into the MP.  Winner(1) will win 50% of that pot. 50% will carry over to the next RND.
-  7.	CYC MP - Cycle 100th Monkey Pot – the grand pot.  The pot will be paid out completely after 100 rounds of 100 mini-games. 100% of the pot will be paid out, then a new cycle will begin.
+  1.	Players are eligible to win in several ways (for this example we will use 2000 BT / RND)
+  2.	Cycle Rewards, players who purchase BT will receive 30% CYCR and that is split up between all present players in that round and all RND in a CYC. 
+  3.	RND - Airdrops – One player per RND has the option to win the 9% airdrop.  Every player has a 1/2000 chance per BT that they own in that RND. 
+  4.	RND MP – 30% of all MG’s go into the MP.  Winner(1) will win 100% of that pot. 
+  5.	CYC MP - Cycle 100th Monkey Pot – the grand pot(30% of each RND for 100 RNDS).  The pot will be paid out completely after 100 rounds. 100% of the pot will be paid out, then a new cycle will begin.
 
 10.MARKETING
 Please review the seperate marketing documents.
 
 11.PROJECT ROADMAP 
-  1.	WEEK 1(January 5, 2019 )  : Complete git readme and roadmap.  technical spec and review 
-  2.	WEEK 2(January 12, 2019)  : development of adjusted smart contract draft, with all major features. Work on creation of Monkey Wallet.  Work on IoS and Android App.  Seek out graphics and UI devs.
-  3.	WEEK 3(January 19, 2019)  : development of final version; external auditing. 
-  4.	WEEK 5(January 26, 2019)  : additional testing on contract. Bug bounty and audit.  
-  5.  WEEK 6(February 2, 2019)  : Web UI and Apps. Bug bounty and audit and additional test on contract.  Vet marketing individuals.
-  6.  WEEK 7(February 9, 2019)  : Mock up UI layout. Pick them. Continue to test the contract(Kovan).
-  7.  WEEK 8(February 16,2019)  : Work on graphics and UI. Start aligning all of the marketing material. Weak to medium level marketing.
-  8.  WEEK 9(February 23,2019)  : Finish.  All final testing completed.  Start launch campaign and heavy marketing.
-  9.  LAUNCH DATE: FEBRUARY 28, 2019
+  1.	WEEK 1(February 28, 2019 )  : Complete git readme and roadmap.  technical spec and review 
+  2.	WEEK 2(March 07, 2019)      : development of adjusted smart contract draft, with all major features. Work on creation of Monkey Wallet.  Work on IoS and Android App.  Seek out graphics and UI devs.
+  3.  WEEK 8(March 14,2019)       : Work on graphics and UI. Start aligning all of the marketing material. Weak to medium level marketing.
+  4.  WEEK 9(March 21,2019)       : Finish.  All final testing completed.  Start launch campaign and heavy marketing.
+  5.  ********LAUNCH DATE*********: MARCH 28, 2019
